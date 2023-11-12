@@ -21,11 +21,32 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
-    
+
+class Interesses(models.Model):
+    interesse = models.CharField(max_length=100)
+
+
+    def __str__(self):
+        return self.interesse
+
+class Cursos(models.Model):
+    curso = models.CharField(max_length=100)
+
+
+    def __str__(self):
+        return self.curso
+
+class Departamento(models.Model):
+    departamento = models.CharField(max_length=100)
+
+
+    def __str__(self):
+        return self.departamento
+
 class Users(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    #interests = models.ManyToManyField(Interests)
+    interests = models.ManyToManyField(Interesses)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15)
     short_bio = models.CharField(max_length=225)
@@ -40,3 +61,47 @@ class Users(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
+class Lab(models.Model):
+    sigla = models.CharField(max_length=10)
+    nomeCompleto = models.CharField(max_length=255)
+
+
+    def __str__(self):
+        return self.sigla
+
+class Professores(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    departamento = models.ManyToManyField(Departamento)
+    disponibilidade = models.BooleanField(default=True)
+    lab = models.ManyToManyField(Lab)
+
+
+    def __str__(self):
+        return self.user.email
+
+
+
+class Projeto(models.Model):
+    responsavel = models.ForeignKey(Professores, on_delete=models.CASCADE)
+    lab = models.ForeignKey(Lab, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=64)
+    descricao = models.CharField(max_length=255)
+    about = models.CharField(max_length=255 )
+    vagas = models.IntegerField(default=1)
+    bgImg = models.URLField()
+    cardImg = models.URLField()
+    date = models.DateField()
+
+
+    def __str__(self):
+        return self.titulo
+
+class Alunos(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    curso = models.ForeignKey(Cursos, on_delete=models.CASCADE)
+    projeto = models.ManyToManyField(Projeto)
+
+
+    def __str__(self):
+        return self.user.email

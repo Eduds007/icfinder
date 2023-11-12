@@ -1,7 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-
-# Create your views here.
 
 def index(request):
-    return HttpResponse('IcFinder Home')
+    context = {}
+    return render(request, 'icfinder_app/index.html', context)

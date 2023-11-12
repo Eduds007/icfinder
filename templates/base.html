@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}{% endblock %} | ICFinder
+    </title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    {% block pagestyle %}
+    {% endblock pagestyle %}
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'index' %}">
+                <div id="homepage-button">
+                    <img src="{% static 'images/logo.svg' %}" alt="Homepage">
+                </div>
+            </a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock content %}
+    </main>
+    <footer>
+    </footer>
+</body>
+
+</html>

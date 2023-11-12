@@ -1,0 +1,15 @@
+header {
+    width: 100%;
+    padding: 10px;
+    background: #F6F6F6;
+    display: flex;
+  }
+
+#homepage-button img {
+    height: 50px;
+    width: auto;
+}
+
+nav {
+    margin-left: 5vw;
+}

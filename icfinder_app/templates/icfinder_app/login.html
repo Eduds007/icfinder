@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Login
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_login.css' %}">
+{% endblock pagestyle %}
+
+{% block content %}
+<div class="container">
+    <div class="main-content">
+      <div class="logo">
+            <img src="{% static 'images/logo.svg' %}" alt="ICFinder Logo">
+      </div>
+      <div class="separator"></div>
+      <div class="login-section">
+        <div class="login-title">Login</div>
+        <div class="input-section">
+          <div class="input-label">Email</div>
+          <div class="input-field">
+            <div class="icon">account_circle</div>
+            <div class="input-text">@usp.br</div>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="input-label">Senha</div>
+          <div class="input-field">
+            <div class="icon">lock</div>
+            <div class="icon">visibility_off</div>
+          </div>
+        </div>
+        <div class="button-section">
+          <div class="button">Cadastrar-se</div>
+          <div class="button">Esqueci minha senha</div>
+        </div>
+        <div class="login-button">
+          <div class="arrow-icon">
+            <span class="icon">arrow_right_alt</span>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,99 @@
+.icon {
+    color: white;
+    font-size: 24px;
+    font-family: 'Material Icons';
+    font-weight: 400;
+    vertical-align: middle;
+  }
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+
+ .card {
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-radius: 3.75rem;
+    background: #ffffff;
+    box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.25);
+        
+ }
+ 
+ .cardImg {
+    width: 360px;
+    border-radius: 3.75rem 3.75rem 0 0;
+ }
+
+.cardText {
+    margin-left: 2.5rem;
+    margin-right: 2.5rem;
+    display: flex;
+    padding-bottom: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1 0 0;
+    align-self: stretch;
+    padding-top: 1rem;
+}
+
+h3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: Arial;
+    font-weight: bolder;
+}
+
+.professor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
+    align-self: stretch;
+}
+
+.circle {
+    display: flex;
+width: 2.75rem;
+height: 2.75rem;
+justify-content: center;
+align-items: center;
+gap: 0.625rem;
+border-radius: 1.5rem;
+background: var(--verde, #2FC8AC);
+}
+
+p {
+    font-family: Arial;
+    font-weight: bolder;
+}
+
+
+.ver-mais-btn {
+    display: flex;
+padding: 0.75rem;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 0.625rem;
+align-self: stretch;
+border-radius: 1.25rem;
+background: var(--branco-cinza, #F8F7FB);
+box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+transition: transform 0.2s ease;
+}
+
+.ver-mais-btn:hover {
+    transform: scale(1.1);
+}

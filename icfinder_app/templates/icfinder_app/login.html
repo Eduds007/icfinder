@@ -18,33 +18,38 @@ Página Inicial
       <div class="separator"></div>
       <div class="login-section">
         <div class="login-title">Login</div>
-        <div class="input-section">
-          <div class="input-label">Email</div>
-          <div class="input-field">
-            <div class="icon">account_circle</div>
-            <div class="input-text">@usp.br</div>
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <div class="input-section">
+            <div class="input-label">Email</div>
+            <div class="input-field">
+              <div class="icon">account_circle</div>
+              <span class="custom-input">{{ login_form.username }}</span>
+            </div>
           </div>
-        </div>
-        <div class="input-section">
-          <div class="input-label">Senha</div>
-          <div class="input-field">
-            <div class="icon">lock</div>
-            <div class="icon">visibility_off</div>
+          <div class="input-section">
+            <div class="input-label">Senha</div>
+            <div class="input-field">
+              <div class="icon">lock</div>
+              <span class="custom-input">{{ login_form.password }}</span>
+            </div>
           </div>
-        </div>
-        <div class="button-section">
-          <div class="button">
-            <a href="{% url 'register' %}">
-              Cadastrar-se
-            </a>
+          <div class="button-section">
+            <div class="button">
+              <a href="{% url 'register' %}">
+                Cadastrar-se
+              </a>
+            </div>
+            <div class="button">Esqueci minha senha</div>
           </div>
-          <div class="button">Esqueci minha senha</div>
-        </div>
-        <div class="login-button">
-          <div class="arrow-icon">
-            <span class="icon">arrow_right_alt</span>
-        </div>
-        </div>
+          <div class="login-button">
+            <button type="submit">
+              <div class="arrow-icon">
+                <span class="icon">arrow_right_alt</span>
+              </div>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

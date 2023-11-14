@@ -1,0 +1,9 @@
+body {
+    margin: 0;
+    font-family: 'Crimson Text', serif;
+  }
+
+form {
+    width: 60%;
+    margin: 0 auto;
+}

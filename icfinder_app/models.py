@@ -22,14 +22,14 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-class Interesses(models.Model):
+class Interesse(models.Model):
     interesse = models.CharField(max_length=100)
 
 
     def __str__(self):
         return self.interesse
 
-class Cursos(models.Model):
+class Curso(models.Model):
     curso = models.CharField(max_length=100)
 
 
@@ -46,7 +46,7 @@ class Departamento(models.Model):
 class Users(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    interests = models.ManyToManyField(Interesses)
+    interests = models.ManyToManyField(Interesse)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15)
     short_bio = models.CharField(max_length=225)
@@ -70,7 +70,7 @@ class Lab(models.Model):
     def __str__(self):
         return self.sigla
 
-class Professores(models.Model):
+class Professor(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     departamento = models.ManyToManyField(Departamento)
     disponibilidade = models.BooleanField(default=True)
@@ -83,7 +83,7 @@ class Professores(models.Model):
 
 
 class Projeto(models.Model):
-    responsavel = models.ForeignKey(Professores, on_delete=models.CASCADE)
+    responsavel = models.ForeignKey(Professor, on_delete=models.CASCADE)
     lab = models.ForeignKey(Lab, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=64)
     descricao = models.CharField(max_length=255)
@@ -97,11 +97,18 @@ class Projeto(models.Model):
     def __str__(self):
         return self.titulo
 
-class Alunos(models.Model):
+class Aluno(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    curso = models.ForeignKey(Cursos, on_delete=models.CASCADE)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     projeto = models.ManyToManyField(Projeto)
 
 
     def __str__(self):
         return self.user.email
+
+class ProfessorRegister(models.Model):
+    email = models.EmailField(unique=True)
+    token = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.email

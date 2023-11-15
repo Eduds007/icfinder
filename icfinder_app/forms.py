@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Users
+from .models import Users, ProfessorRegister
+import secrets
 from django.core.exceptions import ValidationError
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -40,3 +41,17 @@ class CustomUserCreationForm(UserCreationForm):
     #        raise ValidationError("Insira seu email USP.")
     #    return email
 
+class ProfessorRegisterForm(forms.ModelForm):
+    class Meta:
+        model = ProfessorRegister
+        fields = ['email']
+
+    def generate_token(self):
+        return secrets.token_hex(20)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.token = self.generate_token()
+        if commit:
+            instance.save()
+        return instance

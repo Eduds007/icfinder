@@ -24,6 +24,14 @@ class CustomUserCreationForm(UserCreationForm):
             'phone_number': 'Celular',
             'short_bio': 'Short Bio',
         }
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your first name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your last name'}),
+            'interests': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your interests'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Your email'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'}),
+            'short_bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write a short bio'}),
+        }
 
     # aceitar apenas emails no domínio usp
     #def clean_email(self):

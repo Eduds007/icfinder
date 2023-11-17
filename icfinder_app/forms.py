@@ -13,7 +13,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
-class CustomUserCreationForm(UserCreationForm):
+class StudentCreationForm(UserCreationForm):
     class Meta:
         model = Users
         fields = ['first_name', 'last_name', 'interests', 'email', 'phone_number', 'short_bio']
@@ -40,6 +40,20 @@ class CustomUserCreationForm(UserCreationForm):
     #    if email and not email.endswith('@usp.br'):
     #        raise ValidationError("Insira seu email USP.")
     #    return email
+
+class ProfessorValidationForm(forms.Form):
+        email = forms.EmailField()
+        token = forms.CharField()
+
+class ProfessorAttributesForm(forms.ModelForm):
+    class Meta:
+        model = Professor
+        fields = ['departamento', 'disponibilidade', 'lab']
+        widgets = {
+            'departamento': forms.Select(attrs={'class': 'form-control'}),
+            'disponibilidade': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'lab': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        }
 
 class ProfessorRegisterForm(forms.ModelForm):
     email = forms.EmailField()  # Add the email field to the form

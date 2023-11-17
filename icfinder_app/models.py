@@ -75,7 +75,7 @@ class Professor(models.Model):
     departamento = models.ForeignKey(Departamento, null=True, on_delete=models.CASCADE)
     disponibilidade = models.BooleanField(default=True)
     lab = models.ManyToManyField(Lab)
-    token = models.CharField(max_length=255, unique=True, null=True)
+    token = models.CharField(max_length=255, null=True)
     login_completed = models.BooleanField(default=False)
 
     def __str__(self):

@@ -15,27 +15,35 @@ Nessa página deve aparecer a tela de cards para professor ou para aluno a depen
 
   {% for projeto in projetos %}
   <a href="#">
-      <div class="card">
-        <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
-        <div class="cardText">  
-          <h3>{{ projeto.titulo }}</h3>
-          <div class="professor">
-            <div class="circle">
-              <span class="icon">group</span>
+    <div class="flip-card">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
+          <div class="cardText">  
+            <h3>{{ projeto.titulo }}</h3>
+            <div class="professor">
+              <div class="circle">
+                <span class="icon">group</span>
+              </div>
+              <p>Professor Dr {{ projeto.responsavel.user.first_name|title }} {{ projeto.responsavel.user.last_name|title }}</p>
             </div>
-            <p>Professor Dr {{ projeto.responsavel.user.first_name|title }} {{ projeto.responsavel.user.last_name|title }}</p>
-          </div>
-          <div class="professor">
-            <div class="circle">
-              <span class="icon">import_contacts</span>
+            <div class="professor">
+              <div class="circle">
+                <span class="icon">import_contacts</span>
+              </div>
+              <p>{{ projeto.lab.nomeCompleto }}</p>
             </div>
-            <p>{{ projeto.lab.nomeCompleto }}</p>
-          </div>
-          <div class="ver-mais-btn">
-            <p>ver mais</p>
+            <div class="ver-mais-btn">
+              <p>ver mais</p>
+            </div>
           </div>
         </div>
+        <div class="flip-card-back">
+          <p>{{ projeto.about }}</p>
+        </div>
+        
       </div>
+    </div>
   </a>
   {% endfor %}
 </div>

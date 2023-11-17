@@ -111,6 +111,10 @@ TIME_ZONE = "UTC"
 
 AUTH_USER_MODEL = 'icfinder_app.Users'
 
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
+LOGIN_URL = 'login'
+
 USE_I18N = True
 
 USE_TZ = True
@@ -126,3 +130,19 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static'), ]
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+with open('.env') as f:
+    lines = f.readlines()
+    for line in lines:
+        parts = line.strip().split('=')
+        if len(parts) == 2:
+            key, value = parts
+            os.environ[key] = value
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST', default='localhost')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', default=True)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', default='noreply@example.com')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', default=587)

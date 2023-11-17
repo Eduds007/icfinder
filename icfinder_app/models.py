@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -101,8 +103,25 @@ class Aluno(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     interests = models.ManyToManyField(Interesse)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
-    projeto = models.ManyToManyField(Projeto)
+    projeto = models.ManyToManyField(Projeto, blank=True)
 
 
     def __str__(self):
         return self.user.email
+
+class InscricaoProjeto(models.Model):
+    ESTADO_CHOICES = (
+        ('não aceito', 'Não Aceito'),
+        ('pendente', 'Pendente'),
+        ('aceito', 'Aceito'),
+    )
+
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
+    projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE)
+    data_inscricao = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendente')
+
+@receiver(post_save, sender=InscricaoProjeto)
+def register_project(sender, instance, **kwargs):
+    if instance.estado == 'aceito':
+        instance.aluno.projeto.add(instance.projeto)

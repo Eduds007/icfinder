@@ -68,7 +68,7 @@ class ProfessorCreationForm(forms.ModelForm):
         model = Professor
         fields = ['first_name', 'last_name', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'password1', 'password2']
 
-class ProfessorRegisterForm(forms.ModelForm):
+class ProfessorTokenForm(forms.ModelForm):
     email = forms.EmailField()  # Add the email field to the form
 
     class Meta:

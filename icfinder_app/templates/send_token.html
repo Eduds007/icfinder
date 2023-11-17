@@ -11,7 +11,7 @@ Página Inicial
 
 {% block content %}
 <body>
-    <form method="post" action="{% url 'register_professor' %}">
+    <form method="post" action="{% url 'send_token' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Register</button>

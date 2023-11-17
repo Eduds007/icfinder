@@ -3,7 +3,7 @@ from django.views import generic
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import login, logout
-from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorRegisterForm
+from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users, Projeto
 from django.core.mail import EmailMessage
@@ -36,13 +36,23 @@ def login_view(request):
 
 
 def registration_choice(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+    
     return render(request, 'icfinder_app/registration_choice.html')
 
-class AlunoRegistrationView(FormView):
+class AlunoRegistrationView(FormView):    
     template_name = 'registration_student.html'
     form_class = AlunoCreationForm
 
     def form_valid(self, form):
+        password1 = form.cleaned_data['password1']
+        password2 = form.cleaned_data['password2']
+
+        if password1 != password2:
+            form.add_error('password2', 'Passwords do not match')
+            return self.form_invalid(form)
+
         user_instance = Users.objects.create(
             first_name=form.cleaned_data['first_name'],
             last_name=form.cleaned_data['last_name'],
@@ -70,6 +80,9 @@ class AlunoRegistrationView(FormView):
         return redirect('index')
 
 def validate_professor(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+    
     if request.method == 'POST':
         form = ProfessorValidationForm(request.POST)
         if form.is_valid():
@@ -99,6 +112,13 @@ class ProfessorRegistrationView(FormView):
     form_class = ProfessorCreationForm
 
     def form_valid(self, form):
+        password1 = form.cleaned_data['password1']
+        password2 = form.cleaned_data['password2']
+
+        if password1 != password2:
+            form.add_error('password2', 'Passwords do not match')
+            return self.form_invalid(form)
+
         # Retrieve email from the session
         email_from_session = self.request.session.get('validated_email')
 
@@ -140,13 +160,13 @@ class Index(LoginRequiredMixin, generic.ListView):
     context_object_name = 'projetos'
 
 
-class ProfessorRegisterView(CreateView):
+class ProfessorTokenView(CreateView):
     model = Professor
-    form_class = ProfessorRegisterForm
-    template_name = 'register_professor.html'
+    form_class = ProfessorTokenForm
+    template_name = 'send_token.html'
     
     def get_success_url(self):
-        return reverse('register_professor')
+        return reverse('send_token')
 
     def form_valid(self, form):
         response = super().form_valid(form)

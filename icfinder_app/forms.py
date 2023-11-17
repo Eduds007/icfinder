@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Users, Professor
+from .models import Users, Professor,Interesse
 import secrets
 from django.core.exceptions import ValidationError
 
@@ -45,15 +45,18 @@ class ProfessorValidationForm(forms.Form):
         email = forms.EmailField()
         token = forms.CharField()
 
-class ProfessorAttributesForm(forms.ModelForm):
+class ProfessorCreationForm(forms.ModelForm):
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    interests = forms.ModelMultipleChoiceField(queryset=Interesse.objects.all())
+    phone_number = forms.CharField()
+    short_bio = forms.CharField()
+    password1 = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = Professor
-        fields = ['departamento', 'disponibilidade', 'lab']
-        widgets = {
-            'departamento': forms.Select(attrs={'class': 'form-control'}),
-            'disponibilidade': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'lab': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
-        }
+        fields = ['first_name', 'last_name', 'interests', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'password1', 'password2']
 
 class ProfessorRegisterForm(forms.ModelForm):
     email = forms.EmailField()  # Add the email field to the form

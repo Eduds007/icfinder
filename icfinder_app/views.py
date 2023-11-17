@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import login
-from .forms import StudentCreationForm, ProfessorAttributesForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorRegisterForm
-from django.views.generic.edit import CreateView
-from .models import Professor
+from .forms import StudentCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorRegisterForm
+from django.views.generic.edit import CreateView, FormView
+from .models import Professor, Users
 from django.core.mail import EmailMessage
 
 
@@ -53,8 +53,8 @@ def validate_professor(request):
             ).first()
 
             if professor:
-                # Redirect to the professor_attributes view with the professor's ID
-                return redirect('professor_attributes', professor_id=professor.id)
+                request.session['validated_email'] = email
+                return redirect('registration_professor', professor_id=professor.id)
             else:
                 # Handle invalid input, e.g., show an error message
                 form.add_error(None, "Invalid email or token.")
@@ -63,28 +63,45 @@ def validate_professor(request):
 
     return render(request, 'icfinder_app/validate_professor.html', {'form': form})
 
-def professor_attributes(request, professor_id):
-    professor = Professor.objects.get(id=professor_id)
+class ProfessorRegistrationView(FormView):
+    template_name = 'registration_professor.html'
+    form_class = ProfessorCreationForm
 
-    if request.method == 'POST':
-        form = ProfessorAttributesForm(request.POST, instance=professor)
-        if form.is_valid():
-            # Save the attributes
-            form.save()
+    def form_valid(self, form):
+        # Retrieve email from the session
+        email_from_session = self.request.session.get('validated_email')
 
-            # Update the professor and set login_completed to True
-            professor.login_completed = True
-            professor.token = None
-            professor.save()
+        # Retrieve the existing Users instance
+        user_instance = Users.objects.get(email=email_from_session)
 
-            return redirect('index')  # Redirect to the desired page after saving the attributes
-    else:
-        form = ProfessorAttributesForm(instance=professor)
+        # Update the attributes of the Users instance
+        user_instance.first_name = form.cleaned_data['first_name']
+        user_instance.last_name = form.cleaned_data['last_name']
+        user_instance.phone_number = form.cleaned_data['phone_number']
+        user_instance.short_bio = form.cleaned_data['short_bio']
+        user_instance.save()
 
-    # Disable the email field in the form
-    #form.fields['user__email'].widget.attrs['disabled'] = True
+        # Retrieve the existing Professor instance
+        professor_instance = Professor.objects.get(user=user_instance)
 
-    return render(request, 'icfinder_app/professor_attributes.html', {'form': form, 'professor': professor})
+        # Update the attributes of the Professor instance
+        professor_instance.departamento = form.cleaned_data['departamento']
+        professor_instance.disponibilidade = form.cleaned_data['disponibilidade']
+        professor_instance.lab.set(form.cleaned_data['lab'])
+        professor_instance.token = None
+        professor_instance.login_completed = True
+        professor_instance.save()
+
+        # Set the password for the user
+        password1 = form.cleaned_data['password1']
+        user_instance.set_password(password1)
+        user_instance.save()
+
+        # Log the user in
+        login(self.request, user_instance)
+
+        # Redirect to the success URL
+        return redirect('index')
 
 def index(request):
     context = {}

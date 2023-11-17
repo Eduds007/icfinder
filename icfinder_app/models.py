@@ -79,7 +79,7 @@ class Professor(models.Model):
     login_completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.email + f' (Login não concluído)' if not self.login_completed else ''
+        return f"{self.user.email} (Login não concluído)" if self.user and not self.login_completed else f"{self.user.email}"
 
 
 

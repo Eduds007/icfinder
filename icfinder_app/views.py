@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import login
-from .forms import StudentCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorRegisterForm
+from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorRegisterForm
 from django.views.generic.edit import CreateView, FormView
-from .models import Professor, Users
+from .models import Professor, Aluno, Users
 from django.core.mail import EmailMessage
 
 
@@ -27,16 +27,36 @@ def login_view(request):
 def registration_choice(request):
     return render(request, 'icfinder_app/registration_choice.html')
 
-def registration_student(request):
-    if request.method == 'POST':
-        form = StudentCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('index')
-    else:
-        form = StudentCreationForm()
-    return render(request, 'icfinder_app/registration_student.html', {'form': form})
+class AlunoRegistrationView(FormView):
+    template_name = 'registration_student.html'
+    form_class = AlunoCreationForm
+
+    def form_valid(self, form):
+        user_instance = Users.objects.create(
+            first_name=form.cleaned_data['first_name'],
+            last_name=form.cleaned_data['last_name'],
+            email=form.cleaned_data['email'],
+            phone_number=form.cleaned_data['phone_number'],
+            short_bio=form.cleaned_data['short_bio'],
+        )
+
+        aluno_instance = Aluno.objects.create(
+            user=user_instance,
+            curso=form.cleaned_data['curso'],
+        )
+
+        aluno_instance.interests.set(form.cleaned_data['interests'])
+
+        # Set the password for the user
+        password1 = form.cleaned_data['password1']
+        user_instance.set_password(password1)
+        user_instance.save()
+
+        # Log the user in
+        login(self.request, user_instance)
+
+        # Redirect to the success URL
+        return redirect('index')
 
 def validate_professor(request):
     if request.method == 'POST':

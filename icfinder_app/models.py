@@ -46,7 +46,6 @@ class Departamento(models.Model):
 class Users(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    interests = models.ManyToManyField(Interesse)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, null=True)
     short_bio = models.CharField(max_length=225, null=True)
@@ -100,6 +99,7 @@ class Projeto(models.Model):
 
 class Aluno(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    interests = models.ManyToManyField(Interesse)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     projeto = models.ManyToManyField(Projeto)
 

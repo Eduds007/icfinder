@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Users, Professor,Interesse
+from .models import Users, Professor, Aluno, Interesse
 import secrets
 from django.core.exceptions import ValidationError
 
@@ -13,10 +13,19 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
-class StudentCreationForm(UserCreationForm):
+class AlunoCreationForm(forms.ModelForm):
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
+    interests = forms.ModelMultipleChoiceField(queryset=Interesse.objects.all())
+    phone_number = forms.CharField()
+    short_bio = forms.CharField()
+    password1 = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
-        model = Users
-        fields = ['first_name', 'last_name', 'interests', 'email', 'phone_number', 'short_bio']
+        model = Aluno
+        fields = ['first_name', 'last_name', 'email', 'interests', 'phone_number', 'short_bio', 'curso']
         labels = {
             'first_name': 'Nome',
             'last_name': 'Sobrenome',
@@ -24,14 +33,16 @@ class StudentCreationForm(UserCreationForm):
             'email': 'Email',
             'phone_number': 'Celular',
             'short_bio': 'Short Bio',
+            'curso': 'Curso'
         }
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your first name'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your last name'}),
-            'interests': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your interests'}),
+            'interests': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Your interests'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Your email'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'}),
             'short_bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write a short bio'}),
+            'curso': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Your course'}),
         }
 
     # aceitar apenas emails no domínio usp
@@ -48,7 +59,6 @@ class ProfessorValidationForm(forms.Form):
 class ProfessorCreationForm(forms.ModelForm):
     first_name = forms.CharField()
     last_name = forms.CharField()
-    interests = forms.ModelMultipleChoiceField(queryset=Interesse.objects.all())
     phone_number = forms.CharField()
     short_bio = forms.CharField()
     password1 = forms.CharField(widget=forms.PasswordInput)
@@ -56,7 +66,7 @@ class ProfessorCreationForm(forms.ModelForm):
 
     class Meta:
         model = Professor
-        fields = ['first_name', 'last_name', 'interests', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'password1', 'password2']
 
 class ProfessorRegisterForm(forms.ModelForm):
     email = forms.EmailField()  # Add the email field to the form

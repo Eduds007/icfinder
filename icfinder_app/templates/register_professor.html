@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Página Inicial
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_login.css' %}">
+{% endblock pagestyle %}
+
+{% block content %}
+<body>
+    <form method="post" action="{% url 'register_professor' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+</body>
+{% endblock content %}

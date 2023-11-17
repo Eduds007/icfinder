@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+    font-family: 'Crimson Text', serif;
+  }
+
+form {
+    width: 60%;
+    margin: 0 auto;
+}
+
+.form-control {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

@@ -48,8 +48,8 @@ class Users(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30)
     interests = models.ManyToManyField(Interesse)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=15)
-    short_bio = models.CharField(max_length=225)
+    phone_number = models.CharField(max_length=15, null=True)
+    short_bio = models.CharField(max_length=225, null=True)
     is_admin = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
     
@@ -72,13 +72,14 @@ class Lab(models.Model):
 
 class Professor(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    departamento = models.ManyToManyField(Departamento)
+    departamento = models.ForeignKey(Departamento, null=True, on_delete=models.CASCADE)
     disponibilidade = models.BooleanField(default=True)
     lab = models.ManyToManyField(Lab)
-
+    token = models.CharField(max_length=255, unique=True, null=True)
+    login_completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.email
+        return self.user.email + f' (Login não concluído)' if not self.login_completed else ''
 
 
 
@@ -105,10 +106,3 @@ class Aluno(models.Model):
 
     def __str__(self):
         return self.user.email
-
-class ProfessorRegister(models.Model):
-    email = models.EmailField(unique=True)
-    token = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.email

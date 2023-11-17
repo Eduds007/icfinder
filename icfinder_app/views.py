@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ProfessorRegisterForm
 from django.views.generic.edit import CreateView
-from .models import ProfessorRegister
+from .models import Professor
 from django.core.mail import EmailMessage
 
 
@@ -41,7 +41,7 @@ def index(request):
 
 
 class ProfessorRegisterView(CreateView):
-    model = ProfessorRegister
+    model = Professor
     form_class = ProfessorRegisterForm
     template_name = 'register_professor.html'
     

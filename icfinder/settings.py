@@ -128,7 +128,6 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static'), ]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# Load environment variables from .env file
 with open('.env') as f:
     lines = f.readlines()
     for line in lines:
@@ -137,7 +136,6 @@ with open('.env') as f:
             key, value = parts
             os.environ[key] = value
 
-# Use variables in your settings
 EMAIL_HOST = os.environ.get('EMAIL_HOST', default='localhost')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', default='')

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Users, ProfessorRegister
+from .models import Users, Professor
 import secrets
 from django.core.exceptions import ValidationError
 
@@ -42,16 +42,28 @@ class CustomUserCreationForm(UserCreationForm):
     #    return email
 
 class ProfessorRegisterForm(forms.ModelForm):
+    email = forms.EmailField()  # Add the email field to the form
+
     class Meta:
-        model = ProfessorRegister
+        model = Professor
         fields = ['email']
 
     def generate_token(self):
         return secrets.token_hex(20)
 
     def save(self, commit=True):
-        instance = super().save(commit=False)
+        email = self.cleaned_data['email']
+
+        # Create a new Users instance
+        user_instance = Users.objects.create(email=email)
+
+        # Create a new Professor instance
+        instance = Professor(user=user_instance)
         instance.token = self.generate_token()
+        instance.login_completed = False  # Set login_completed to False
+
         if commit:
+            user_instance.save()
             instance.save()
+
         return instance

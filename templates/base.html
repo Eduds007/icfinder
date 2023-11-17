@@ -23,6 +23,14 @@
                 <div id="homepage-button">
                     <img src="{% static 'images/logo.svg' %}" alt="Homepage">
                 </div>
+                <ul>
+                    {% if user.is_authenticated %}
+                        <li> Logado com {{ user.first_name }} </li>
+                        <li><a href="{% url 'logout' %}">Log out</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Log in</a></li>
+                    {% endif %}
+                </ul>
             </a>
         </nav>
     </header>

@@ -110,6 +110,9 @@ LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "UTC"
 
 AUTH_USER_MODEL = 'icfinder_app.Users'
+
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 LOGIN_URL = 'login'
 
 USE_I18N = True

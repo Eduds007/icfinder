@@ -1,14 +1,21 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorRegisterForm
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
+def custom_logout(request):
+    logout(request)
+    return redirect(settings.LOGOUT_REDIRECT_URL)
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+
     if request.method == 'POST':
         login_form = CustomAuthenticationForm(request, request.POST)
         if login_form.is_valid():

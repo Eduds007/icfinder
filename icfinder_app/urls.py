@@ -11,5 +11,6 @@ urlpatterns = [
     path('registration_student/', views.AlunoRegistrationView.as_view(), name='registration_student'),
     path('validate_professor/', views.validate_professor, name='validate_professor'),
     path('registration_professor/<int:professor_id>', views.ProfessorRegistrationView.as_view(), name='registration_professor'),
-    path('send_token/', views.ProfessorTokenView.as_view(), name='send_token')
+    path('send_token/', views.ProfessorTokenView.as_view(), name='send_token'),
+    path('project/<int:pk>/', views.ProjectDetailView.as_view(), name='detail'),
 ]

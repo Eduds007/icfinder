@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Página do post
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_detail.css' %}">
+{% endblock pagestyle %}
+    
+{% block content %}
+    <h1>{{ projeto }}</h1>
+
+    
+    <form method="post" action="{% url 'detail' projeto.id %}">
+        {% csrf_token %}
+        <button type="submit">Inscrever-se</button>
+      </form>
+{% endblock %}

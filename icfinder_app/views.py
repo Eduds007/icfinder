@@ -5,12 +5,13 @@ from django.urls import reverse
 from django.contrib.auth import login, logout
 from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm
 from django.views.generic.edit import CreateView, FormView
-from .models import Professor, Aluno, Users, Projeto
+from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 def custom_logout(request):
     logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
@@ -185,3 +186,24 @@ class ProfessorTokenView(CreateView):
         email.send(fail_silently=False)
 
         return response
+
+
+class ProjectDetailView(generic.DetailView):
+    model = Projeto
+    template_name = 'icfinder_app/detail.html'
+    context_object_name = 'projeto'
+    
+
+    def post(self, request, *args, **kwargs):
+        post = self.get_object()
+
+
+        aluno = get_object_or_404(Aluno, user=self.request.user)
+        inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=post)
+        inscricao.estado = 'pendente'
+        inscricao.save()
+
+
+        return HttpResponseRedirect(reverse('detail', args=[str(post.id)]))
+
+    

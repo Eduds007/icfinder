@@ -5,6 +5,7 @@ from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidation
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users
 from django.core.mail import EmailMessage
+from django.contrib.auth.decorators import login_required
 
 
 def login_view(request):
@@ -123,6 +124,7 @@ class ProfessorRegistrationView(FormView):
         # Redirect to the success URL
         return redirect('index')
 
+@login_required
 def index(request):
     context = {}
     return render(request, 'icfinder_app/index.html', context)

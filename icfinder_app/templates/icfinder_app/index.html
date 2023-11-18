@@ -11,6 +11,11 @@ Página Inicial
 
 {% block content %}
 
+<form method="get">
+  {{ filter.form.as_p }}
+  <button type="submit">Filtrar</button>
+</form>
+
   <p class="encontrados">Número de projetos encontrados: {{ num_projetos }}</p>
 
 <div class="card-container">

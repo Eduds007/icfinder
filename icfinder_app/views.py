@@ -14,6 +14,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Prefetch
+from .filters import ProjetoFilter
+from django_filters.views import FilterView
+
 def custom_logout(request):
     logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
@@ -157,21 +160,23 @@ class ProfessorRegistrationView(FormView):
         # Redirect to the success URL
         return redirect('index')
 
-class Index(LoginRequiredMixin, generic.ListView):
+class Index(LoginRequiredMixin, FilterView):
     model = Projeto
     template_name = 'icfinder_app/index.html'
+    filterset_class = ProjetoFilter
     context_object_name = 'projetos'
 
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context['num_projetos'] = self.get_queryset().count()
-        return context
 
     def get_queryset(self):
-        queryset = Projeto.objects.prefetch_related(Prefetch("inscritos", queryset=InscricaoProjeto.objects.filter(estado='pendente')))
+        queryset = super().get_queryset()
+        queryset = queryset.prefetch_related(Prefetch("inscritos", queryset=InscricaoProjeto.objects.filter(estado='pendente')))
         return queryset
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['num_projetos'] = self.get_queryset().filter(self.filterset_class(self.request.GET).qs.query.where).count()
+        return context
 class ProfessorTokenView(CreateView):
     model = Professor
     form_class = ProfessorTokenForm

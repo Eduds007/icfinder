@@ -1,0 +1,36 @@
+.chats {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    background-color: #f6f6f6;
+    margin: 2rem;
+    padding: 1rem;
+    box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    font-family: Helvetica, sans-serif;
+    margin:36px;
+    font-size: 1.6rem;
+}
+
+p {
+    font-family: Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 36px;
+    background-color: #f6f6f6;
+    box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, background-color 0.3s;
+
+    border-radius: 10px;
+    
+
+}
+
+p:hover {
+    transform: scale(1.01);
+    background-color: rgb(87,159 , 251);
+    color: white;
+}

@@ -1,14 +1,34 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_chats.css' %}">
+{% endblock pagestyle %}
+
 {% block content %}
- {% for chat in chats %}
- {% for participante in chat.participants.all %}
- 
- {% if participante != user %}
-            <a href="{% url 'chat' participante.id %}">
-               <p>Conversa com:  {{ participante }} </p>
-            </a>
+
+<section class="chats">
+   <div class="header">
+      <h2>Conversas</h2>
+   </div>
+   <div class="chat-container">
+
+      {% for chat in chats %}
+      <div class="chat">
+         
+         {% for participante in chat.participants.all %}
+         {% if participante != user %}
+         <a href="{% url 'chat' participante.id %}">
+            <p> {{ participante }} </p>
+         </a>
          {% endif %}
+         {% endfor %}
+         
+      </div>
       {% endfor %}
- {% endfor %}
+   </div>
+   
+</section>
+
 {% endblock %}

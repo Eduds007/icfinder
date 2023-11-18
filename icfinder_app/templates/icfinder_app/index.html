@@ -87,5 +87,9 @@ Nessa página deve aparecer a tela de cards para professor ou para aluno a depen
     </a>
     {% endif %}
   {% endfor %}
-</div>
+  <a href="{% url 'project_create' %}">
+    <div class="card-add">
+            <span class="icon-add">add_box</span> 
+    </div>
+  </a>
 {% endblock content %}

@@ -221,3 +221,24 @@ transition: transform 0.2s ease;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   margin-top: 1rem;
 }
+
+.icon-add {
+  color: #6D6E71;
+  font-size: 4rem;
+  font-family: 'Material Icons';
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+
+.card-add {
+  width: 360px;
+  height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3.75rem;
+  background: #ffffff;
+  box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.25);
+
+}

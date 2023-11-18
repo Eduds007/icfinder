@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
 from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm
 from django.views.generic.edit import CreateView, FormView
@@ -260,4 +260,9 @@ class ProjectDetailView(generic.DetailView):
 
         return HttpResponseRedirect(reverse('detail', args=[str(projeto.id)]))
 
-    
+
+class ProjectCreateView(generic.CreateView):
+    model = Projeto
+    template_name = 'icfinder_app/new.html'
+    success_url = reverse_lazy('index')
+    fields = '__all__'

@@ -13,4 +13,5 @@ urlpatterns = [
     path('registration_professor/<int:professor_id>', views.ProfessorRegistrationView.as_view(), name='registration_professor'),
     path('send_token/', views.ProfessorTokenView.as_view(), name='send_token'),
     path('project/<int:pk>/', views.ProjectDetailView.as_view(), name='detail'),
+    path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
 ]

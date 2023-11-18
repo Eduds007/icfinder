@@ -18,12 +18,12 @@ Página do post
         {{ inscrito }}
         <form method="post" action="{% url 'detail' projeto.id %}">
           {% csrf_token %}
-          <button type="submit" name="action" value="aceitar_{{ user.id }}">Aceitar</button>
-    <button type="submit" name="action" value="recusar_{{ user.id }}">Recusar</button>
+          <button type="submit" name="action" value="aceitar_{{ inscrito.aluno }}">Aceitar</button>
+          <button type="submit" name="action" value="recusar_{{ inscrito.aluno }}">Recusar</button>
         </form>
     {% endfor %}
-    {% elif user.aluno%}
-      {% if inscricao_estado == 'pendente' %}
+    {% elif user.aluno %}
+      {% if inscricao_estado == 'pendente' or  inscricao_estado == 'aceito' %}
       {{ inscricao_estado }}
       {% else %}
       <form method="post" action="{% url 'detail' projeto.id %}">

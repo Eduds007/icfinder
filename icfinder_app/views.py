@@ -194,13 +194,22 @@ class ProjectDetailView(generic.DetailView):
 
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs) # Adicionando variável ao contexto
-        context['inscricao_estado'] = self.get_inscricao_estado()
+        context = super().get_context_data(**kwargs)# Adicionando variável ao contexto
+        try:
+            aluno =  Aluno.objects.get(user =self.request.user)
+            context['inscricao_estado'] = self.get_inscricao_estado()
+        except Aluno.DoesNotExist:
+            context['inscricao_estado'] = ''
+    
+        
+            
         context['inscritos'] = self.get_inscritos()
+        print(context)
         return context
     
     def get_inscritos(self):
         projeto = self.get_object()
+        print(projeto)
         inscritos = InscricaoProjeto.objects.filter(projeto=projeto, estado='pendente')
         return inscritos
     
@@ -223,12 +232,16 @@ class ProjectDetailView(generic.DetailView):
             inscricao.save()
          
         elif action.startswith('aceitar_'):
-            user_id = action.split('_')[1]
-            user = Users.objects.filter(id = user_id).first()
+            user_email = action.split('_')[1]
+            print(user_email)
+            user = Users.objects.filter(email = user_email).first()
+            print(user)
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'aceito'
             inscricao.save()
+            projeto.vagas -=1 
+            projeto.save()
 
 
         elif action.startswith('recusar_'):

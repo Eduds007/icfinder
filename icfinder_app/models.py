@@ -129,3 +129,22 @@ class InscricaoProjeto(models.Model):
 def register_project(sender, instance, **kwargs):
     if instance.estado == 'aceito':
         instance.aluno.projeto.add(instance.projeto)
+
+
+class Conversation(models.Model):
+    participants = models.ManyToManyField(Users, related_name='conversations')
+
+    def __str__(self):
+        participants_list =  self.participants.all()
+        return f'Conversa com: {participants_list}'
+
+
+class Message(models.Model):
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    sender = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='sent_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username} in {self.conversation.id} at {self.timestamp}"
+

@@ -4,9 +4,9 @@ from django.views import generic
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
-from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm
+from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
 from django.views.generic.edit import CreateView, FormView
-from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto
+from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -278,3 +278,41 @@ class ProjectCreateView(generic.CreateView):
     template_name = 'icfinder_app/new.html'
     success_url = reverse_lazy('index')
     fields = '__all__'
+
+
+@login_required
+def chat(request, receiver_id):
+    receiver = get_object_or_404(Users, id=receiver_id)
+    participants = [request.user, receiver]
+    
+
+    # Verifica se a conversa já existe entre os participantes
+    conversation = Conversation.objects.filter(participants__in=participants).distinct()
+
+    if not conversation.exists():
+        conversation = Conversation.objects.create()
+        conversation.participants.set(participants)
+        conversation.save()
+
+    messages = Message.objects.filter(conversation=conversation[0]).order_by('timestamp')
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            content = form.cleaned_data['content']
+            print(content)
+            Message.objects.create(conversation=conversation[0], sender=request.user, content=content)
+            return redirect('chat', receiver_id=receiver.id)
+    else:
+        form = MessageForm()
+
+    context = { 'receiver': receiver, 'messages': messages, 'conversation': conversation, 'form': form}
+    
+        
+    return render(request, 'icfinder_app/chat.html', context=context)
+
+def chat_list(request):
+    chats = Conversation.objects.filter(participants=request.user)
+ 
+
+    return render(request, 'icfinder_app/chats.html', {'chats':chats})

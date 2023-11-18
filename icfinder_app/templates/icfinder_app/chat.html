@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for participante in chat.participants.all %}
+         
+{% if participante != user %}
+   <p>Conversa com:  {{ participante }} </p>
+{% endif %}
+{% endfor %}
+  <h2>Conversar com {{ receiver }}</h2>
+
+  <div id="chat-container">
+    {% for message in messages %}
+      <p>{{ message.sender }} ({{ message.timestamp }}): {{ message.content }}</p>
+    {% endfor %}
+  </div>
+
+  <form method="post" action="{% url 'chat' receiver_id=receiver.id %}">
+    {% csrf_token %}
+    <input type="text" name="content" required>
+    <button type="submit">Send</button>
+  </form>
+{% endblock %}

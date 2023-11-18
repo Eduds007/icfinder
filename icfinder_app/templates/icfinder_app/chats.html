@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+ {% for chat in chats %}
+ {% for participante in chat.participants.all %}
+ 
+ {% if participante != user %}
+            <a href="{% url 'chat' participante.id %}">
+               <p>Conversa com:  {{ participante }} </p>
+            </a>
+         {% endif %}
+      {% endfor %}
+ {% endfor %}
+{% endblock %}

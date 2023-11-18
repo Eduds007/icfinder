@@ -14,4 +14,6 @@ urlpatterns = [
     path('send_token/', views.ProfessorTokenView.as_view(), name='send_token'),
     path('project/<int:pk>/', views.ProjectDetailView.as_view(), name='detail'),
     path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
+    path('chat/<int:receiver_id>/', views.chat, name='chat'),
+    path('chats', views.chat_list, name='chats'),
 ]

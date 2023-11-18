@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
+from django.db.models import Prefetch
 def custom_logout(request):
     logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
@@ -159,6 +160,10 @@ class Index(LoginRequiredMixin, generic.ListView):
     model = Projeto
     template_name = 'icfinder_app/index.html'
     context_object_name = 'projetos'
+
+    def get_queryset(self):
+        queryset = Projeto.objects.prefetch_related(Prefetch("inscritos", queryset=InscricaoProjeto.objects.filter(estado='pendente')))
+        return queryset
 
 class ProfessorTokenView(CreateView):
     model = Professor

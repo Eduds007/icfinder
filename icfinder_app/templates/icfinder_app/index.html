@@ -63,7 +63,23 @@ Nessa página deve aparecer a tela de cards para professor ou para aluno a depen
             </div>
           </div>
           <div class="flip-card-back">
-            <p>{{ projeto.about }}</p>
+            <div class="back-container">
+              
+              <div class="back-text">
+  
+                <p>Alunos interessados</p>
+              </div>
+  
+              {% for inscrito in projeto.inscritos.all %}
+                <div class="back-text">
+                  <p>{{inscrito}}</p>
+                </div>
+              {% endfor %}
+              <div class="back-text">
+
+                <p>Vagas disponíveis: {{ projeto.vagas }}</p>
+              </div>
+            </div>
           </div>
           
         </div>

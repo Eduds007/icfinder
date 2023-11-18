@@ -40,8 +40,8 @@
 
   .flip-card-back {
     display: flex;
-    background-color: dodgerblue;
-    color: white;
+    background-color: #ffffff;
+    color: black;
     transform: rotateY(180deg);
     height: 100%;
     border-radius: 3.75rem;
@@ -202,4 +202,22 @@ transition: transform 0.2s ease;
 
 .ver-mais-btn:hover {
   transform: scale(1.1);
+}
+
+.back-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.back-text {
+  display: flex;
+  padding: 0.75rem;
+  gap: 0.625rem ;
+  border-radius: 0.25rem;
+  background: var(--branco-cinza, #F8F7FB);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  margin-top: 1rem;
 }

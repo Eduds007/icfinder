@@ -124,3 +124,82 @@ transition: transform 0.2s ease;
 .ver-mais-btn:hover {
     transform: scale(1.1);
 }
+
+
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.card {
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  border-radius: 3.75rem;
+  background: #ffffff;
+  box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.25);
+
+}
+
+
+
+.cardText {
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+  display: flex;
+  padding-bottom: 1rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  flex: 1 0 0;
+  align-self: stretch;
+  padding-top: 1rem;
+}
+
+h3 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: Arial;
+  font-weight: bolder;
+}
+
+.professor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  align-self: stretch;
+}
+
+
+
+
+
+
+.ver-mais-btn {
+  display: flex;
+padding: 0.75rem;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 0.625rem;
+align-self: stretch;
+border-radius: 1.25rem;
+background: var(--branco-cinza, #F8F7FB);
+box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+transition: transform 0.2s ease;
+}
+
+.ver-mais-btn:hover {
+  transform: scale(1.1);
+}

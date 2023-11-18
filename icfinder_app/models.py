@@ -72,7 +72,7 @@ class Lab(models.Model):
         return self.sigla
 
 class Professor(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.OneToOneField(Users, on_delete=models.CASCADE)
     departamento = models.ForeignKey(Departamento, null=True, on_delete=models.CASCADE)
     disponibilidade = models.BooleanField(default=True)
     lab = models.ManyToManyField(Lab)
@@ -100,7 +100,7 @@ class Projeto(models.Model):
         return self.titulo
 
 class Aluno(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.OneToOneField(Users, on_delete=models.CASCADE)
     interests = models.ManyToManyField(Interesse)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     projeto = models.ManyToManyField(Projeto, blank=True)
@@ -120,6 +120,10 @@ class InscricaoProjeto(models.Model):
     projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE)
     data_inscricao = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendente')
+
+
+    def __str__(self):
+        return self.aluno.user.email
 
 @receiver(post_save, sender=InscricaoProjeto)
 def register_project(sender, instance, **kwargs):

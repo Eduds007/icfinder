@@ -160,7 +160,6 @@ class Index(LoginRequiredMixin, generic.ListView):
     template_name = 'icfinder_app/index.html'
     context_object_name = 'projetos'
 
-
 class ProfessorTokenView(CreateView):
     model = Professor
     form_class = ProfessorTokenForm
@@ -192,18 +191,55 @@ class ProjectDetailView(generic.DetailView):
     model = Projeto
     template_name = 'icfinder_app/detail.html'
     context_object_name = 'projeto'
+
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs) # Adicionando variável ao contexto
+        context['inscricao_estado'] = self.get_inscricao_estado()
+        context['inscritos'] = self.get_inscritos()
+        return context
+    
+    def get_inscritos(self):
+        projeto = self.get_object()
+        inscritos = InscricaoProjeto.objects.filter(projeto=projeto, estado='pendente')
+        return inscritos
+    
+    def get_inscricao_estado(self):
+        # Retorna o estado da inscrição do aluno no projeto atual
+        aluno = get_object_or_404(Aluno, user=self.request.user)
+        projeto = self.get_object()
+        inscricao_projeto = InscricaoProjeto.objects.filter(aluno=aluno, projeto=projeto).first()
+        return inscricao_projeto.estado if inscricao_projeto else None
 
     def post(self, request, *args, **kwargs):
-        post = self.get_object()
+        projeto = self.get_object()
+        action = request.POST.get('action')
+
+        if action == 'inscrever':
+
+            aluno = get_object_or_404(Aluno, user=self.request.user)
+            inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
+            inscricao.estado = 'pendente'
+            inscricao.save()
+         
+        elif action.startswith('aceitar_'):
+            user_id = action.split('_')[1]
+            user = Users.objects.filter(id = user_id).first()
+            aluno = get_object_or_404(Aluno, user=user)
+            inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
+            inscricao.estado = 'aceito'
+            inscricao.save()
 
 
-        aluno = get_object_or_404(Aluno, user=self.request.user)
-        inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=post)
-        inscricao.estado = 'pendente'
-        inscricao.save()
+        elif action.startswith('recusar_'):
+            user_id = action.split('_')[1]
+            user = Users.objects.filter(id = user_id).first()
+            aluno = get_object_or_404(Aluno, user=user)
+            inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
+            inscricao.estado = 'recusado'
+            inscricao.save()
 
 
-        return HttpResponseRedirect(reverse('detail', args=[str(post.id)]))
+        return HttpResponseRedirect(reverse('detail', args=[str(projeto.id)]))
 
     

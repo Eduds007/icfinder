@@ -12,39 +12,64 @@ Página Inicial
 {% block content %}
 Nessa página deve aparecer a tela de cards para professor ou para aluno a depender do usuário. Se não estiver logado deve redirecionar para login
 <div class="card-container">
-
   {% for projeto in projetos %}
-  <a href="#">
-    <div class="flip-card">
-      <div class="flip-card-inner">
-        <div class="flip-card-front">
-          <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
-          <div class="cardText">  
-            <h3>{{ projeto.titulo }}</h3>
-            <div class="professor">
-              <div class="circle">
-                <span class="icon">group</span>
-              </div>
-              <p>Professor Dr {{ projeto.responsavel.user.first_name|title }} {{ projeto.responsavel.user.last_name|title }}</p>
+    {% if user.aluno %}
+    <a href="{% url 'detail' projeto.id %}">
+      <div class="card">
+        <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
+        <div class="cardText">  
+          <h3>{{ projeto.titulo }}</h3>
+          <div class="professor">
+            <div class="circle">
+              <span class="icon">group</span>
             </div>
-            <div class="professor">
-              <div class="circle">
-                <span class="icon">import_contacts</span>
-              </div>
-              <p>{{ projeto.lab.nomeCompleto }}</p>
+            <p>Professor Dr {{ projeto.responsavel.user.first_name|title }} {{ projeto.responsavel.user.last_name|title }}</p>
+          </div>
+          <div class="professor">
+            <div class="circle">
+              <span class="icon">import_contacts</span>
             </div>
-            <div class="ver-mais-btn">
-              <p>ver mais</p>
-            </div>
+            <p>{{ projeto.lab.nomeCompleto }}</p>
+          </div>
+          <div class="ver-mais-btn">
+            <p>ver mais</p>
           </div>
         </div>
-        <div class="flip-card-back">
-          <p>{{ projeto.about }}</p>
-        </div>
-        
       </div>
-    </div>
-  </a>
+    </a>
+    {% elif user.professor %}
+    <a href="{% url 'detail' projeto.id %}">
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
+            <div class="cardText">  
+              <h3>{{ projeto.titulo }}</h3>
+              <div class="professor">
+                <div class="circle">
+                  <span class="icon">group</span>
+                </div>
+                <p>Professor Dr {{ projeto.responsavel.user.first_name|title }} {{ projeto.responsavel.user.last_name|title }}</p>
+              </div>
+              <div class="professor">
+                <div class="circle">
+                  <span class="icon">import_contacts</span>
+                </div>
+                <p>{{ projeto.lab.nomeCompleto }}</p>
+              </div>
+              <div class="ver-mais-btn">
+                <p>ver mais</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card-back">
+            <p>{{ projeto.about }}</p>
+          </div>
+          
+        </div>
+      </div>
+    </a>
+    {% endif %}
   {% endfor %}
 </div>
 {% endblock content %}

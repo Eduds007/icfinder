@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.views import generic
 from django.shortcuts import render, redirect
@@ -160,6 +161,12 @@ class Index(LoginRequiredMixin, generic.ListView):
     model = Projeto
     template_name = 'icfinder_app/index.html'
     context_object_name = 'projetos'
+
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['num_projetos'] = self.get_queryset().count()
+        return context
 
     def get_queryset(self):
         queryset = Projeto.objects.prefetch_related(Prefetch("inscritos", queryset=InscricaoProjeto.objects.filter(estado='pendente')))

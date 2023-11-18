@@ -10,7 +10,9 @@ Página Inicial
 {% endblock pagestyle %}
 
 {% block content %}
-Nessa página deve aparecer a tela de cards para professor ou para aluno a depender do usuário. Se não estiver logado deve redirecionar para login
+
+  <p class="encontrados">Número de projetos encontrados: {{ num_projetos }}</p>
+
 <div class="card-container">
   {% for projeto in projetos %}
     {% if user.aluno %}

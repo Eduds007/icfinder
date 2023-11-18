@@ -1,23 +1,80 @@
 {% extends 'base.html' %}
 
-{% block content %}
-{% for participante in chat.participants.all %}
-         
-{% if participante != user %}
-   <p>Conversa com:  {{ participante }} </p>
-{% endif %}
-{% endfor %}
-  <h2>Conversar com {{ receiver }}</h2>
+{% load static %}
 
-  <div id="chat-container">
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_chat.css' %}">
+{% endblock pagestyle %}
+
+{% block content %}
+  
+  <section class="msger">
+    <header class="msger-header">
+      <div class="msger-header-title">
+        <i class="fas fa-comment-alt"></i>
+        {% for participante in chat.participants.all %}
+         
+        {% if participante != user %}
+           Conversa com:  {{ participante }} 
+        {% endif %}
+        {% endfor %}
+          Conversa com {{ receiver }}
+        
+      </div>
+      <div class="msger-header-options">
+        <span><i class="fas fa-cog"></i></span>
+      </div>
+    </header>
     {% for message in messages %}
-      <p>{{ message.sender }} ({{ message.timestamp }}): {{ message.content }}</p>
-    {% endfor %}
+    <main class="msger-chat">
+      {%if message.sender != user %}
+      <div class="msg left-msg">
+        <div
+         class="msg-img"
+         style="background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg)"
+        ></div>
+        <div class="msg-bubble">
+          <div class="msg-info">
+            <div class="msg-info-name">{{ message.sender }}</div>
+            <div class="msg-info-time">{{ message.timestamp|date:"d-m-Y H:i"  }}</div>
+          </div>
+          <div class="msg-text">
+            {{ message.content }}
+          </div>
+        </div>
+      </div>
+      
+      {%else %}
+      <div class="msg right-msg">
+        <div
+         class="msg-img"
+         style="background-image: url(https://image.flaticon.com/icons/svg/145/145867.svg)"
+        ></div>
+  
+        <div class="msg-bubble">
+          <div class="msg-info">
+            <div class="msg-info-name">{{ message.sender }}</div>
+            <div class="msg-info-time">{{ message.timestamp|date:"d-m-Y H:i"  }}</div>
+          </div>
+  
+          <div class="msg-text">
+            {{ message.content }}
+          </div>
+        </div>
+      </div>
+      
+      {% endif %}
+    </main>
+      {% endfor %}
+      
+      
+      
+      <form class="msger-inputarea" method="post" action="{% url 'chat' receiver_id=receiver.id %}">
+          {% csrf_token %} 
+          <input type="text" class="msger-input" placeholder="Envie sua mensagem" name="content" required>
+          <button type="submit" class="msger-send-btn">Enviar</button>
+        </form>
+      </section>
   </div>
 
-  <form method="post" action="{% url 'chat' receiver_id=receiver.id %}">
-    {% csrf_token %}
-    <input type="text" name="content" required>
-    <button type="submit">Send</button>
-  </form>
 {% endblock %}

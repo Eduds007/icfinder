@@ -10,13 +10,40 @@ Página Inicial
 {% endblock pagestyle %}
 
 {% block content %}
+<div class="infos">
 
-<form method="get">
-  {{ filter.form.as_p }}
-  <button type="submit">Filtrar</button>
-</form>
+  <form method="get">
+  <label class="dropdown">
+
+    <div class="dd-button">
+      Filtros
+    </div>
+
+    <input type="checkbox" class="dd-input" id="test">
+
+    <ul class="dd-menu">
+      <li> <div class="filter-div">
+        
+        <p>Tem vaga disponível?</p>
+        {{ filter.form.disponibilidade }} 
+      </div></li>
+      <li> <div class="filter-div">
+        
+        <p>Ordem de apresentação</p>
+      {{ filter.form.ordem }} 
+    </div></li>
+      <li class="divider"></li>
+      <li class="li-btn">
+        <button class="filtrar-btn" type="submit">Filtrar</button>
+      
+      </li>
+    </ul>
+    
+  </label>
+  </form>
 
   <p class="encontrados">Número de projetos encontrados: {{ num_projetos }}</p>
+</div>
 
 <div class="card-container">
   {% for projeto in projetos %}

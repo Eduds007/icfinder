@@ -4,6 +4,7 @@ from django.views import generic
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message
@@ -17,28 +18,27 @@ from django.db.models import Prefetch
 from .filters import ProjetoFilter
 from django_filters.views import FilterView
 
-def custom_logout(request):
-    logout(request)
-    return redirect(settings.LOGOUT_REDIRECT_URL)
+class CustomLoginView(LoginView):
+    template_name = 'icfinder_app/login.html'
+    form_class = CustomAuthenticationForm
 
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('index')
-
-    if request.method == 'POST':
-        login_form = CustomAuthenticationForm(request, request.POST)
-        if login_form.is_valid():
-            user = login_form.get_user()
-            login(request, user)
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
             return redirect('index')
-    else:
-        login_form = CustomAuthenticationForm()
+        return super().get(request, *args, **kwargs)
 
-    return render(
-        request,
-        'icfinder_app/login.html',
-        {'login_form': login_form}
-    )
+    def form_valid(self, form):
+        user = form.get_user()
+        login(self.request, user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('index')
+
+class CustomLogoutView(LogoutView):
+    def dispatch(self, request, *args, **kwargs):
+        logout(request)
+        return redirect(settings.LOGOUT_REDIRECT_URL)
 
 
 def registration_choice(request):

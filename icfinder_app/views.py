@@ -10,7 +10,7 @@ from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversa
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Prefetch
@@ -66,7 +66,7 @@ class AlunoRegistrationView(FormView):
         password2 = form.cleaned_data['password2']
 
         if password1 != password2:
-            form.add_error('password2', 'Passwords do not match')
+            form.add_error('password2', 'Senhas não correspondentes.')
             return self.form_invalid(form)
 
         user_instance = Users.objects.create(
@@ -120,7 +120,7 @@ class ValidateProfessorView(View):
                 request.session['validated_email'] = email
                 return redirect('registration_professor', professor_id=professor.id)
             else:
-                form.add_error(None, "Invalid email or token.")
+                form.add_error(None, "Email ou token inválido.")
 
         return render(request, self.template_name, {'form': form})
 
@@ -139,7 +139,7 @@ class ProfessorRegistrationView(FormView):
         password2 = form.cleaned_data['password2']
 
         if password1 != password2:
-            form.add_error('password2', 'Passwords do not match')
+            form.add_error('password2', 'Senhas não correspondentes.')
             return self.form_invalid(form)
 
         email_from_session = self.request.session.get('validated_email')
@@ -185,19 +185,25 @@ class Index(LoginRequiredMixin, FilterView):
         context['num_projetos'] = self.get_queryset().filter(self.filterset_class(self.request.GET).qs.query.where).count()
         return context
     
-class ProfessorTokenView(CreateView):
+class ProfessorTokenView(UserPassesTestMixin, CreateView):
     model = Professor
     form_class = ProfessorTokenForm
     template_name = 'send_token.html'
     
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        return redirect('index')
+
     def get_success_url(self):
         return reverse('send_token')
 
     def form_valid(self, form):
         response = super().form_valid(form)
 
-        subject = 'Your Registration Token'
-        body = f'Thank you for registering! Your token is: {self.object.token}'
+        subject = 'Token para iniciar cadastro no ICFinder'
+        body = f'Para registrar sua conta no ICFinder e ter as permissões para gerenciar seus projetos, encontrando alunos para integrar os seus grupos de pesquisa, utilize o seu email usp e o token {self.object.token}.'
         sender = 'noreply@semycolon.com'
         recipient = [form.cleaned_data['email']]
 

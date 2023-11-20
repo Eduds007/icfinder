@@ -42,28 +42,19 @@ class CustomLogoutView(LogoutView):
         logout(request)
         return redirect(settings.LOGOUT_REDIRECT_URL)
 
-class RegistrationChoiceView(FormView):
+class RegistrationChoiceView(View):
     template_name = 'icfinder_app/registration.html'
-    form_class = RegistrationChoiceForm
 
     @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('index')
-        return super().get(request, *args, **kwargs)
+        return render(request, self.template_name, {'registration_type': 'choice'})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['registration_type'] = 'choice'
         return context
-
-    def form_valid(self, form):
-        registration_type = form.cleaned_data['registration_type']
-
-        if registration_type == 'student':
-            return redirect('registration_student')
-        elif registration_type == 'professor':
-            return redirect('validate_professor')
 
 class AlunoRegistrationView(FormView):    
     template_name = 'icfinder_app/registration.html'
@@ -212,7 +203,7 @@ class Index(LoginRequiredMixin, FilterView):
 class ProfessorTokenView(UserPassesTestMixin, CreateView):
     model = Professor
     form_class = ProfessorTokenForm
-    template_name = 'send_token.html'
+    template_name = 'icfinder_app/send_token.html'
     
     def test_func(self):
         return self.request.user.is_superuser

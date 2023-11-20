@@ -10,15 +10,22 @@ Cadastro
 {% endblock pagestyle %}
 
 {% block content %}
-<body>
+<body class="registration-body">
 
     {% if registration_type == 'choice' %}
-        <h2>Choose Registration Type</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Submit</button>
-        </form>
+        <div class="container">
+            <a href="{% url 'registration_student' %}" class="card">
+                <div class="card-body">
+                    <img src="{% static 'images/alunos.svg' %}" alt="Student Image">
+                </div>
+            </a>
+        
+            <a href="{% url 'validate_professor' %}" class="card">
+                <div class="card-body">
+                    <img src="{% static 'images/professores.svg' %}" alt="Professor Image">
+                </div>
+            </a>
+        </div>
     {% elif registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
             {% csrf_token %}

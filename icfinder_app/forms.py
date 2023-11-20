@@ -15,11 +15,15 @@ class CustomAuthenticationForm(AuthenticationForm):
 
 class RegistrationChoiceForm(forms.Form):
     CHOICES = [
-        ('student', 'Register as Student'),
-        ('professor', 'Register as Professor'),
+        ('student', 'Cadastrar como estudante'),
+        ('professor', 'Cadastrar como professor'),
     ]
 
-    registration_type = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
+    registration_type = forms.ChoiceField(
+        choices=CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label='',
+    )
 
 class AlunoCreationForm(forms.ModelForm):
     first_name = forms.CharField()

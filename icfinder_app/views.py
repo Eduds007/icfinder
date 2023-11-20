@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm, RegistrationChoiceForm
+from .forms import AlunoCreationForm, ProfessorCreationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message
 from django.core.mail import EmailMessage
@@ -31,6 +31,16 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         user = form.get_user()
+
+        professor = Professor.objects.filter(
+            user__email=user.email,
+            login_completed=False
+        ).first()
+
+        if professor:
+            self.request.session['validated_email'] = user.email
+            return redirect('registration_professor', professor_id=professor.id)
+
         login(self.request, user)
         return super().form_valid(form)
 
@@ -41,20 +51,6 @@ class CustomLogoutView(LogoutView):
     def dispatch(self, request, *args, **kwargs):
         logout(request)
         return redirect(settings.LOGOUT_REDIRECT_URL)
-
-class RegistrationChoiceView(View):
-    template_name = 'icfinder_app/registration.html'
-
-    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('index')
-        return render(request, self.template_name, {'registration_type': 'choice'})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['registration_type'] = 'choice'
-        return context
 
 class AlunoRegistrationView(View):
     template_name = 'icfinder_app/registration.html'
@@ -104,38 +100,6 @@ class AlunoRegistrationView(View):
 
         context = {'form': form, 'registration_type': 'student'}
         return render(request, self.template_name, context)
-
-class ValidateProfessorView(View):
-    template_name = 'icfinder_app/registration.html'
-    form_class = ProfessorValidationForm
-
-    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('index')
-
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form, 'registration_type': 'professor'})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            token = form.cleaned_data['token']
-
-            professor = Professor.objects.filter(
-                user__email=email,
-                token=token,
-                login_completed=False
-            ).first()
-
-            if professor:
-                request.session['validated_email'] = email
-                return redirect('registration_professor', professor_id=professor.id)
-            else:
-                form.add_error(None, "Email ou token inválido.")
-
-        return render(request, self.template_name, {'form': form})
 
 class ProfessorRegistrationView(FormView):
     template_name = 'icfinder_app/registration.html'
@@ -221,7 +185,7 @@ class ProfessorTokenView(UserPassesTestMixin, CreateView):
         response = super().form_valid(form)
 
         subject = 'Token para iniciar cadastro no ICFinder'
-        body = f'Para registrar sua conta no ICFinder e ter as permissões para gerenciar seus projetos, encontrando alunos para integrar os seus grupos de pesquisa, utilize o seu email usp e o token {self.object.token}.'
+        body = f'Para registrar sua conta no ICFinder e ter as permissões para gerenciar seus projetos, encontrando alunos para integrar os seus grupos de pesquisa, utilize o seu email usp e o token {self.object.token} como senha para prosseguir no cadastro.'
         sender = 'noreply@semycolon.com'
         recipient = [form.cleaned_data['email']]
 

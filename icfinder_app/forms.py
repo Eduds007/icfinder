@@ -13,18 +13,6 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
-class RegistrationChoiceForm(forms.Form):
-    CHOICES = [
-        ('student', 'Cadastrar como estudante'),
-        ('professor', 'Cadastrar como professor'),
-    ]
-
-    registration_type = forms.ChoiceField(
-        choices=CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label='',
-    )
-
 class AlunoCreationForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
@@ -77,17 +65,31 @@ class AlunoCreationForm(forms.ModelForm):
     #        raise ValidationError("Insira seu email USP.")
     #    return email
 
-class ProfessorValidationForm(forms.Form):
-        email = forms.EmailField()
-        token = forms.CharField()
-
 class ProfessorCreationForm(forms.ModelForm):
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    phone_number = forms.CharField()
-    short_bio = forms.CharField()
-    password1 = forms.CharField(widget=forms.PasswordInput)
-    password2 = forms.CharField(widget=forms.PasswordInput)
+    first_name = forms.CharField(
+        label='Nome',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu nome'})
+    )
+    last_name = forms.CharField(
+        label='Sobrenome',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu sobrenome'})
+    )
+    phone_number = forms.CharField(
+        label='Celular',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'})
+    )
+    short_bio = forms.CharField(
+        label='Short Bio',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escreva uma breve descrição sobre você'})
+    )
+    password1 = forms.CharField(
+        label='Senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Senha'})
+    )
+    password2 = forms.CharField(
+        label='Confirme a senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirme a senha'})
+    )
 
     class Meta:
         model = Professor
@@ -113,6 +115,7 @@ class ProfessorTokenForm(forms.ModelForm):
         instance = Professor(user=user_instance)
         instance.token = self.generate_token()
         instance.login_completed = False  # Set login_completed to False
+        user_instance.set_password(instance.token)
 
         if commit:
             user_instance.save()

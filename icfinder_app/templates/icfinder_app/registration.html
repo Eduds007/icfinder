@@ -11,22 +11,7 @@ Cadastro
 
 {% block content %}
 <body>
-
-    {% if registration_type == 'choice' %}
-        <div class="container">
-            <a href="{% url 'registration_student' %}" class="card">
-                <div class="card-body">
-                    <img src="{% static 'images/alunos.svg' %}" alt="Student Image">
-                </div>
-            </a>
-        
-            <a href="{% url 'validate_professor' %}" class="card">
-                <div class="card-body">
-                    <img src="{% static 'images/professores.svg' %}" alt="Professor Image">
-                </div>
-            </a>
-        </div>
-    {% elif registration_type == 'student' %}
+    {% if registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
             {% for field in form %}
             <div class="form-group">
@@ -36,12 +21,6 @@ Cadastro
             </div>
             {% endfor %}
             <button type="submit">Cadastrar</button>
-        </form>
-    {% elif registration_type == 'professor' %}
-        <form method="post" action="{% url 'validate_professor' %}">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Validar</button>
         </form>
     {% elif registration_type == 'professor_registration' %}
         <form method="post">

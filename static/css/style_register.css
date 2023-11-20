@@ -1,6 +1,7 @@
-body {
+body, html {
     margin: 0;
     font-family: 'Crimson Text', serif;
+    height: 70%;
   }
 
 form {
@@ -10,4 +11,80 @@ form {
 
 .form-control {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+
+.container {
+    width: 70%;
+    height: 50%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 30%;
+    min-width: 400px;
+    height: auto;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin: 30px 40px 0 0;
+    transition: background-color 0.3s;
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    max-height: 50%;
+    margin-bottom: 10px;
+}
+
+.card:hover {
+    background-color: #dcdcdc;
+}
+
+@media (max-width: 600px) {
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.error {
+    color: red;
+    margin-top: 5px;
 }

@@ -1,147 +1,141 @@
 from typing import Any
-from django.shortcuts import render
-from django.views import generic
+from django.views import generic, View
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
-from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
+from django.contrib.auth.views import LoginView, LogoutView
+from .forms import AlunoCreationForm, ProfessorCreationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Prefetch
 from .filters import ProjetoFilter
 from django_filters.views import FilterView
+from django.views.decorators.cache import cache_control
+from django.utils.decorators import method_decorator
 
-def custom_logout(request):
-    logout(request)
-    return redirect(settings.LOGOUT_REDIRECT_URL)
+class CustomLoginView(LoginView):
+    template_name = 'icfinder_app/login.html'
+    form_class = CustomAuthenticationForm
 
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('index')
-
-    if request.method == 'POST':
-        login_form = CustomAuthenticationForm(request, request.POST)
-        if login_form.is_valid():
-            user = login_form.get_user()
-            login(request, user)
+    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
             return redirect('index')
-    else:
-        login_form = CustomAuthenticationForm()
+        return super().get(request, *args, **kwargs)
 
-    return render(
-        request,
-        'icfinder_app/login.html',
-        {'login_form': login_form}
-    )
+    def form_valid(self, form):
+        user = form.get_user()
 
+        professor = Professor.objects.filter(
+            user__email=user.email,
+            login_completed=False
+        ).first()
 
-def registration_choice(request):
-    if request.user.is_authenticated:
-        return redirect('index')
-    
-    return render(request, 'icfinder_app/registration_choice.html')
+        if professor:
+            self.request.session['validated_email'] = user.email
+            return redirect('registration_professor', professor_id=professor.id)
 
-class AlunoRegistrationView(FormView):    
-    template_name = 'registration_student.html'
+        login(self.request, user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('index')
+
+class CustomLogoutView(LogoutView):
+    def dispatch(self, request, *args, **kwargs):
+        logout(request)
+        return redirect(settings.LOGOUT_REDIRECT_URL)
+
+class AlunoRegistrationView(View):
+    template_name = 'icfinder_app/registration.html'
     form_class = AlunoCreationForm
 
-    def form_valid(self, form):
-        password1 = form.cleaned_data['password1']
-        password2 = form.cleaned_data['password2']
-
-        if password1 != password2:
-            form.add_error('password2', 'Passwords do not match')
-            return self.form_invalid(form)
-
-        user_instance = Users.objects.create(
-            first_name=form.cleaned_data['first_name'],
-            last_name=form.cleaned_data['last_name'],
-            email=form.cleaned_data['email'],
-            phone_number=form.cleaned_data['phone_number'],
-            short_bio=form.cleaned_data['short_bio'],
-        )
-
-        aluno_instance = Aluno.objects.create(
-            user=user_instance,
-            curso=form.cleaned_data['curso'],
-        )
-
-        aluno_instance.interests.set(form.cleaned_data['interests'])
-
-        # Set the password for the user
-        password1 = form.cleaned_data['password1']
-        user_instance.set_password(password1)
-        user_instance.save()
-
-        # Log the user in
-        login(self.request, user_instance)
-
-        # Redirect to the success URL
-        return redirect('index')
-
-def validate_professor(request):
-    if request.user.is_authenticated:
-        return redirect('index')
+    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('index')
+        
+        form = self.form_class()
+        context = {'form': form, 'registration_type': 'student'}
+        return render(request, self.template_name, context)
     
-    if request.method == 'POST':
-        form = ProfessorValidationForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
         if form.is_valid():
-            email = form.cleaned_data['email']
-            token = form.cleaned_data['token']
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
 
-            # Check for a matching professor with login_completed=False and the provided token
-            professor = Professor.objects.filter(
-                user__email=email,
-                token=token,
-                login_completed=False
-            ).first()
-
-            if professor:
-                request.session['validated_email'] = email
-                return redirect('registration_professor', professor_id=professor.id)
+            if password1 != password2:
+                form.add_error('password2', 'Senhas não correspondentes.')
             else:
-                # Handle invalid input, e.g., show an error message
-                form.add_error(None, "Invalid email or token.")
-    else:
-        form = ProfessorValidationForm()
+                user_instance = Users.objects.create(
+                    first_name=form.cleaned_data['first_name'],
+                    last_name=form.cleaned_data['last_name'],
+                    email=form.cleaned_data['email'],
+                    phone_number=form.cleaned_data['phone_number'],
+                    short_bio=form.cleaned_data['short_bio'],
+                )
 
-    return render(request, 'icfinder_app/validate_professor.html', {'form': form})
+                aluno_instance = Aluno.objects.create(
+                    user=user_instance,
+                    curso=form.cleaned_data['curso'],
+                )
+
+                aluno_instance.interests.set(form.cleaned_data['interests'])
+
+                # Atribui senha ao usuário
+                password1 = form.cleaned_data['password1']
+                user_instance.set_password(password1)
+                user_instance.save()
+                login(request, user_instance)
+
+                return redirect('index')
+
+        context = {'form': form, 'registration_type': 'student'}
+        return render(request, self.template_name, context)
 
 class ProfessorRegistrationView(FormView):
-    template_name = 'registration_professor.html'
+    template_name = 'icfinder_app/registration.html'
     form_class = ProfessorCreationForm
+
+    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('index')
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['registration_type'] = 'professor_registration'
+        return context
 
     def form_valid(self, form):
         password1 = form.cleaned_data['password1']
         password2 = form.cleaned_data['password2']
 
         if password1 != password2:
-            form.add_error('password2', 'Passwords do not match')
+            form.add_error('password2', 'Senhas não correspondentes.')
             return self.form_invalid(form)
 
-        # Retrieve email from the session
         email_from_session = self.request.session.get('validated_email')
-
-        # Retrieve the existing Users instance
         user_instance = Users.objects.get(email=email_from_session)
 
-        # Update the attributes of the Users instance
+        # Atualiza com os dados faltantes de usuário
         user_instance.first_name = form.cleaned_data['first_name']
         user_instance.last_name = form.cleaned_data['last_name']
         user_instance.phone_number = form.cleaned_data['phone_number']
         user_instance.short_bio = form.cleaned_data['short_bio']
         user_instance.save()
 
-        # Retrieve the existing Professor instance
+        # Atualiza os atributos agora com um professor com registro completo
         professor_instance = Professor.objects.get(user=user_instance)
-
-        # Update the attributes of the Professor instance
         professor_instance.departamento = form.cleaned_data['departamento']
         professor_instance.disponibilidade = form.cleaned_data['disponibilidade']
         professor_instance.lab.set(form.cleaned_data['lab'])
@@ -149,15 +143,12 @@ class ProfessorRegistrationView(FormView):
         professor_instance.login_completed = True
         professor_instance.save()
 
-        # Set the password for the user
+        # Atribui a senha ao usuário
         password1 = form.cleaned_data['password1']
         user_instance.set_password(password1)
         user_instance.save()
-
-        # Log the user in
         login(self.request, user_instance)
 
-        # Redirect to the success URL
         return redirect('index')
 
 class Index(LoginRequiredMixin, FilterView):
@@ -165,8 +156,6 @@ class Index(LoginRequiredMixin, FilterView):
     template_name = 'icfinder_app/index.html'
     filterset_class = ProjetoFilter
     context_object_name = 'projetos'
-
-
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -177,19 +166,26 @@ class Index(LoginRequiredMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context['num_projetos'] = self.get_queryset().filter(self.filterset_class(self.request.GET).qs.query.where).count()
         return context
-class ProfessorTokenView(CreateView):
+    
+class ProfessorTokenView(UserPassesTestMixin, CreateView):
     model = Professor
     form_class = ProfessorTokenForm
-    template_name = 'send_token.html'
+    template_name = 'icfinder_app/send_token.html'
     
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        return redirect('index')
+
     def get_success_url(self):
         return reverse('send_token')
 
     def form_valid(self, form):
         response = super().form_valid(form)
 
-        subject = 'Your Registration Token'
-        body = f'Thank you for registering! Your token is: {self.object.token}'
+        subject = 'Token para iniciar cadastro no ICFinder'
+        body = f'Para registrar sua conta no ICFinder e ter as permissões para gerenciar seus projetos, encontrando alunos para integrar os seus grupos de pesquisa, utilize o seu email usp e o token {self.object.token} como senha para prosseguir no cadastro.'
         sender = 'noreply@semycolon.com'
         recipient = [form.cleaned_data['email']]
 
@@ -209,7 +205,6 @@ class ProjectDetailView(generic.DetailView):
     template_name = 'icfinder_app/detail.html'
     context_object_name = 'projeto'
 
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)# Adicionando variável ao contexto
         try:

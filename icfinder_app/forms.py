@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Users, Professor, Aluno, Interesse
+from .models import Users, Professor, Aluno, Interesse, Curso
 import secrets
 from django.core.exceptions import ValidationError
 
@@ -14,36 +14,49 @@ class CustomAuthenticationForm(AuthenticationForm):
     password = forms.CharField(widget=widgets['password'])
 
 class AlunoCreationForm(forms.ModelForm):
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    email = forms.EmailField()
-    interests = forms.ModelMultipleChoiceField(queryset=Interesse.objects.all())
-    phone_number = forms.CharField()
-    short_bio = forms.CharField()
-    password1 = forms.CharField(widget=forms.PasswordInput)
-    password2 = forms.CharField(widget=forms.PasswordInput)
+    first_name = forms.CharField(
+        label='Nome',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu nome'})
+    )
+    last_name = forms.CharField(
+        label='Sobrenome',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu sobrenome'})
+    )
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email'})
+    )
+    interests = forms.ModelMultipleChoiceField(
+        label='Interesses',
+        queryset=Interesse.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+    )
+    phone_number = forms.CharField(
+        label='Celular',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'})
+    )
+    short_bio = forms.CharField(
+        label='Short Bio',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escreva uma breve descrição sobre você'})
+    )
+    password1 = forms.CharField(
+        label='Senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Senha'})
+    )
+    password2 = forms.CharField(
+        label='Confirme a senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirme a senha'})
+    )
+
+    curso = forms.ModelChoiceField(
+        label='Curso',
+        queryset=Curso.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = Aluno
         fields = ['first_name', 'last_name', 'email', 'interests', 'phone_number', 'short_bio', 'curso']
-        labels = {
-            'first_name': 'Nome',
-            'last_name': 'Sobrenome',
-            'interests': 'Interesses',
-            'email': 'Email',
-            'phone_number': 'Celular',
-            'short_bio': 'Short Bio',
-            'curso': 'Curso'
-        }
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your first name'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your last name'}),
-            'interests': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Your interests'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Your email'}),
-            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'}),
-            'short_bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write a short bio'}),
-            'curso': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Your course'}),
-        }
 
     # aceitar apenas emails no domínio usp
     #def clean_email(self):
@@ -52,17 +65,31 @@ class AlunoCreationForm(forms.ModelForm):
     #        raise ValidationError("Insira seu email USP.")
     #    return email
 
-class ProfessorValidationForm(forms.Form):
-        email = forms.EmailField()
-        token = forms.CharField()
-
 class ProfessorCreationForm(forms.ModelForm):
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    phone_number = forms.CharField()
-    short_bio = forms.CharField()
-    password1 = forms.CharField(widget=forms.PasswordInput)
-    password2 = forms.CharField(widget=forms.PasswordInput)
+    first_name = forms.CharField(
+        label='Nome',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu nome'})
+    )
+    last_name = forms.CharField(
+        label='Sobrenome',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu sobrenome'})
+    )
+    phone_number = forms.CharField(
+        label='Celular',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'})
+    )
+    short_bio = forms.CharField(
+        label='Short Bio',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escreva uma breve descrição sobre você'})
+    )
+    password1 = forms.CharField(
+        label='Senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Senha'})
+    )
+    password2 = forms.CharField(
+        label='Confirme a senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirme a senha'})
+    )
 
     class Meta:
         model = Professor
@@ -88,6 +115,7 @@ class ProfessorTokenForm(forms.ModelForm):
         instance = Professor(user=user_instance)
         instance.token = self.generate_token()
         instance.login_completed = False  # Set login_completed to False
+        user_instance.set_password(instance.token)
 
         if commit:
             user_instance.save()

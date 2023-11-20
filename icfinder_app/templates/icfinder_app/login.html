@@ -24,19 +24,19 @@ Login
             <div class="input-label">Email</div>
             <div class="input-field">
               <div class="icon">account_circle</div>
-              <span class="custom-input">{{ login_form.username }}</span>
+              <span class="custom-input">{{ form.username }}</span>
             </div>
           </div>
           <div class="input-section">
             <div class="input-label">Senha</div>
             <div class="input-field">
               <div class="icon">lock</div>
-              <span class="custom-input">{{ login_form.password }}</span>
+              <span class="custom-input">{{ form.password }}</span>
             </div>
           </div>
           <div class="button-section">
             <div class="button">
-              <a href="{% url 'registration_choice' %}">
+              <a href="{% url 'registration_student' %}">
                 Cadastrar-se
               </a>
             </div>

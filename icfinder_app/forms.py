@@ -13,6 +13,14 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
+class RegistrationChoiceForm(forms.Form):
+    CHOICES = [
+        ('student', 'Register as Student'),
+        ('professor', 'Register as Professor'),
+    ]
+
+    registration_type = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
+
 class AlunoCreationForm(forms.ModelForm):
     first_name = forms.CharField()
     last_name = forms.CharField()

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Cadastro
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_register.css' %}">
+{% endblock pagestyle %}
+
+{% block content %}
+<body>
+
+    {% if registration_type == 'choice' %}
+        <h2>Choose Registration Type</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+    {% elif registration_type == 'student' %}
+        <form method="post" action="{% url 'registration_student' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Cadastrar</button>
+        </form>
+    {% elif registration_type == 'professor' %}
+        <form method="post" action="{% url 'validate_professor' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Validar</button>
+        </form>
+    {% elif registration_type == 'professor_registration' %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    {% endif %}
+
+</body>
+{% endblock content %}

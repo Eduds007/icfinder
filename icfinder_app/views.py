@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
+from .forms import AlunoCreationForm, ProfessorCreationForm, ProfessorValidationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm, RegistrationChoiceForm
 from django.views.generic.edit import CreateView, FormView
 from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message
 from django.core.mail import EmailMessage
@@ -42,17 +42,31 @@ class CustomLogoutView(LogoutView):
         logout(request)
         return redirect(settings.LOGOUT_REDIRECT_URL)
 
-class RegistrationChoiceView(View):
-    template_name = 'icfinder_app/registration_choice.html'
+class RegistrationChoiceView(FormView):
+    template_name = 'icfinder_app/registration.html'
+    form_class = RegistrationChoiceForm
 
     @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('index')
-        return render(request, self.template_name)
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['registration_type'] = 'choice'
+        return context
+
+    def form_valid(self, form):
+        registration_type = form.cleaned_data['registration_type']
+
+        if registration_type == 'student':
+            return redirect('registration_student')
+        elif registration_type == 'professor':
+            return redirect('validate_professor')
 
 class AlunoRegistrationView(FormView):    
-    template_name = 'registration_student.html'
+    template_name = 'icfinder_app/registration.html'
     form_class = AlunoCreationForm
 
     @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
@@ -60,6 +74,11 @@ class AlunoRegistrationView(FormView):
         if request.user.is_authenticated:
             return redirect('index')
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['registration_type'] = 'student'
+        return context
 
     def form_valid(self, form):
         password1 = form.cleaned_data['password1']
@@ -93,7 +112,7 @@ class AlunoRegistrationView(FormView):
         return redirect('index')
 
 class ValidateProfessorView(View):
-    template_name = 'icfinder_app/validate_professor.html'
+    template_name = 'icfinder_app/registration.html'
     form_class = ProfessorValidationForm
 
     @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
@@ -102,7 +121,7 @@ class ValidateProfessorView(View):
             return redirect('index')
 
         form = self.form_class()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'registration_type': 'professor'})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -125,7 +144,7 @@ class ValidateProfessorView(View):
         return render(request, self.template_name, {'form': form})
 
 class ProfessorRegistrationView(FormView):
-    template_name = 'registration_professor.html'
+    template_name = 'icfinder_app/registration.html'
     form_class = ProfessorCreationForm
 
     @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
@@ -133,6 +152,11 @@ class ProfessorRegistrationView(FormView):
         if request.user.is_authenticated:
             return redirect('index')
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['registration_type'] = 'professor_registration'
+        return context
 
     def form_valid(self, form):
         password1 = form.cleaned_data['password1']

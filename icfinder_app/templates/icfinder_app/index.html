@@ -46,8 +46,8 @@ Página Inicial
 </div>
 
 <div class="card-container">
+  {% if user.aluno %}
   {% for projeto in projetos %}
-    {% if user.aluno %}
     <a href="{% url 'detail' projeto.id %}">
       <div class="card">
         <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
@@ -71,7 +71,9 @@ Página Inicial
         </div>
       </div>
     </a>
+    {% endfor %}
     {% elif user.professor %}
+    {% for projeto in projetos %}
     <a href="{% url 'detail' projeto.id %}">
       <div class="flip-card">
         <div class="flip-card-inner">

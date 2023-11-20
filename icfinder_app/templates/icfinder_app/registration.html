@@ -10,7 +10,7 @@ Cadastro
 {% endblock pagestyle %}
 
 {% block content %}
-<body class="registration-body">
+<body>
 
     {% if registration_type == 'choice' %}
         <div class="container">
@@ -28,8 +28,13 @@ Cadastro
         </div>
     {% elif registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
-            {% csrf_token %}
-            {{ form.as_p }}
+            {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
             <button type="submit">Cadastrar</button>
         </form>
     {% elif registration_type == 'professor' %}

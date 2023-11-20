@@ -56,7 +56,7 @@ class RegistrationChoiceView(View):
         context['registration_type'] = 'choice'
         return context
 
-class AlunoRegistrationView(FormView):    
+class AlunoRegistrationView(View):
     template_name = 'icfinder_app/registration.html'
     form_class = AlunoCreationForm
 
@@ -64,43 +64,46 @@ class AlunoRegistrationView(FormView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('index')
-        return super().get(request, *args, **kwargs)
+        
+        form = self.form_class()
+        context = {'form': form, 'registration_type': 'student'}
+        return render(request, self.template_name, context)
+    
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['registration_type'] = 'student'
-        return context
+        if form.is_valid():
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
 
-    def form_valid(self, form):
-        password1 = form.cleaned_data['password1']
-        password2 = form.cleaned_data['password2']
+            if password1 != password2:
+                form.add_error('password2', 'Senhas não correspondentes.')
+            else:
+                user_instance = Users.objects.create(
+                    first_name=form.cleaned_data['first_name'],
+                    last_name=form.cleaned_data['last_name'],
+                    email=form.cleaned_data['email'],
+                    phone_number=form.cleaned_data['phone_number'],
+                    short_bio=form.cleaned_data['short_bio'],
+                )
 
-        if password1 != password2:
-            form.add_error('password2', 'Senhas não correspondentes.')
-            return self.form_invalid(form)
+                aluno_instance = Aluno.objects.create(
+                    user=user_instance,
+                    curso=form.cleaned_data['curso'],
+                )
 
-        user_instance = Users.objects.create(
-            first_name=form.cleaned_data['first_name'],
-            last_name=form.cleaned_data['last_name'],
-            email=form.cleaned_data['email'],
-            phone_number=form.cleaned_data['phone_number'],
-            short_bio=form.cleaned_data['short_bio'],
-        )
+                aluno_instance.interests.set(form.cleaned_data['interests'])
 
-        aluno_instance = Aluno.objects.create(
-            user=user_instance,
-            curso=form.cleaned_data['curso'],
-        )
+                # Atribui senha ao usuário
+                password1 = form.cleaned_data['password1']
+                user_instance.set_password(password1)
+                user_instance.save()
+                login(request, user_instance)
 
-        aluno_instance.interests.set(form.cleaned_data['interests'])
+                return redirect('index')
 
-        # Atribui senha ao usuário
-        password1 = form.cleaned_data['password1']
-        user_instance.set_password(password1)
-        user_instance.save()
-        login(self.request, user_instance)
-
-        return redirect('index')
+        context = {'form': form, 'registration_type': 'student'}
+        return render(request, self.template_name, context)
 
 class ValidateProfessorView(View):
     template_name = 'icfinder_app/registration.html'

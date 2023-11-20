@@ -69,7 +69,7 @@ class Lab(models.Model):
 
 
     def __str__(self):
-        return self.sigla
+        return f'{self.nomeCompleto} ({self.sigla})'
 
 class Professor(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)

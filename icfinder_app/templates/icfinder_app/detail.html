@@ -15,8 +15,8 @@ Página do post
     <div class = 'titulo'> <h1>{{ projeto }}</h1> </div>
     
     <div class = 'desc_about'>
-    {{ projeto.descricao }}
-    {{ projeto.about }}
+    <p>{{ projeto.descricao }}</p>
+    <p>{{ projeto.about }}</p>
     </div>
     {% if user.professor %}
     <p>Alunos interessados</p>
@@ -29,7 +29,8 @@ Página do post
         </form>
     
     {% endfor %}
-    <a href="{% url 'update' projeto.id %}">Editar projeto</a>
+    <a href="{% url 'project_update' projeto.id %}">Editar projeto</a>
+    <a href="{% url 'project_delete' projeto.id %}">Deletar projeto</a>
     {% elif user.aluno %}
       {% if inscricao_estado == 'pendente' or  inscricao_estado == 'aceito' %}
       {{ inscricao_estado }}

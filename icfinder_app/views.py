@@ -283,6 +283,11 @@ class ProjectCreateView(generic.CreateView):
     success_url = reverse_lazy('index')
     fields = '__all__'
 
+class ProjectDeleteView(generic.DeleteView):
+    model = Projeto
+    template_name = 'icfinder_app/delete.html'
+    success_url = reverse_lazy('index')
+
 
 @login_required
 def chat(request, receiver_id):

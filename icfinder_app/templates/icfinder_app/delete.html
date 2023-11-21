@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="{% url 'project_delete' projeto.id %}" method="post">
+  {% csrf_token %}
+  <p>
+    Você tem certeza que deseja apagar esse projeto?
+  </p>
+  <button type="submit">Sim</button>
+</form>
+{% endblock content %}

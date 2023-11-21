@@ -10,8 +10,14 @@ Página do post
 {% endblock pagestyle %}
     
 {% block content %}
-    <h1>{{ projeto }}</h1>
-    Nessa página deve ser carregado o detail view de cada projeto
+  <div class = 'main_content'>
+    <img class = 'bgImg' src= "{{ projeto.bgImg }}" alt="bgImg">
+    <div class = 'titulo'> <h1>{{ projeto }}</h1> </div>
+    
+    <div class = 'desc_about'>
+    {{ projeto.descricao }}
+    {{ projeto.about }}
+    </div>
     {% if user.professor %}
     <p>Alunos interessados</p>
     {% for inscrito in inscritos %}
@@ -21,7 +27,9 @@ Página do post
           <button type="submit" name="action" value="aceitar_{{ inscrito.aluno }}">Aceitar</button>
           <button type="submit" name="action" value="recusar_{{ inscrito.aluno }}">Recusar</button>
         </form>
+    
     {% endfor %}
+    <a href="{% url 'update' projeto.id %}">Editar projeto</a>
     {% elif user.aluno %}
       {% if inscricao_estado == 'pendente' or  inscricao_estado == 'aceito' %}
       {{ inscricao_estado }}
@@ -32,5 +40,5 @@ Página do post
         </form>
       {% endif %}
     {% endif %}
-    
+  </div>
 {% endblock %}

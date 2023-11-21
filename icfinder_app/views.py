@@ -268,6 +268,15 @@ class ProjectDetailView(generic.DetailView):
         return HttpResponseRedirect(reverse('detail', args=[str(projeto.id)]))
 
 
+class ProjectUpdateView(generic.UpdateView):
+    model = Projeto
+    template_name = 'icfinder_app/update.html'
+    fields = '__all__'
+
+    def get_success_url(self):
+        return reverse('detail', kwargs={'pk': self.object.pk})
+    
+
 class ProjectCreateView(generic.CreateView):
     model = Projeto
     template_name = 'icfinder_app/new.html'

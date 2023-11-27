@@ -102,8 +102,9 @@ class ProfessorTokenForm(forms.ModelForm):
         model = Professor
         fields = ['email']
 
-    def generate_token(self):
-        return secrets.token_hex(20)
+    def generate_token(self, length=20):
+        byte_length = (length + 1) // 2
+        return secrets.token_hex(byte_length)
 
     def save(self, commit=True):
         email = self.cleaned_data['email']

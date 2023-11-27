@@ -18,6 +18,7 @@ from .filters import ProjetoFilter
 from django_filters.views import FilterView
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
+import secrets
 
 class CustomLoginView(LoginView):
     template_name = 'icfinder_app/login.html'
@@ -199,6 +200,44 @@ class ProfessorTokenView(UserPassesTestMixin, CreateView):
 
         return response
 
+class ResetPasswordView(FormView):
+    template_name = 'icfinder_app/reset_password.html'
+ 
+    def generate_token(self, length=15):
+        byte_length = (length + 1) // 2
+        return secrets.token_hex(byte_length)
+    
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get('email', '')
+        if email:
+            temp_password = self.generate_token()
+
+            try:
+                user_instance = Users.objects.get(email=email)
+                user_instance.set_password(temp_password)
+                user_instance.save()
+
+                subject = 'Token para redefinição de senha no ICFinder'
+                body = f'Para recuperar sua conta no ICFinder, execute login com a senha temporária gerada e defina uma nova senha no seu perfil de usuário. A senha gerada é {temp_password}'
+                sender = 'noreply@semycolon.com'
+                recipient = [email]
+
+                email_msg = EmailMessage(
+                    subject,
+                    body,
+                    sender,
+                    recipient
+                )
+                email_msg.send(fail_silently=False)
+
+                return redirect(reverse('login'))
+            except Users.DoesNotExist:
+                pass
+            
+        return render(request, self.template_name, {'error': 'Invalid email'})
 
 class ProjectDetailView(generic.DetailView):
     model = Projeto

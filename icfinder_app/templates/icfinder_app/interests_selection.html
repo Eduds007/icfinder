@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+Cadastro
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_register.css' %}">
+{% endblock pagestyle %}
+
+{% block pagescript %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock pagescript %}
+
+{% block content %}
+<h2>Select Your Interests</h2>
+  
+<form method="post" action="{% url 'interests_selection' %}" id="interestsForm">
+  {% csrf_token %}
+  
+  {% for interest in interests %}
+    <label class="balloon" for="interest_{{ interest.id }}">
+      <input type="checkbox" id="interest_{{ interest.id }}" name="interests" value="{{ interest.id }}" class="hidden-checkbox">
+      <span>{{ interest.interesse }}</span>
+    </label>
+  {% endfor %}
+  
+  <button type="submit">Submit</button>
+</form>
+{% endblock %}

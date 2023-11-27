@@ -101,7 +101,7 @@ class Projeto(models.Model):
 
 class Aluno(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
-    interests = models.ManyToManyField(Interesse)
+    interests = models.ManyToManyField(Interesse, blank=True)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     projeto = models.ManyToManyField(Projeto, blank=True)
 

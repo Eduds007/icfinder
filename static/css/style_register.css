@@ -88,3 +88,35 @@ input[type="password"] {
     color: red;
     margin-top: 5px;
 }
+
+.balloon {
+    display: inline-block;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .hidden-checkbox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  
+  .balloon span {
+    color: black;
+  }
+  
+  .balloon.selected {
+    background-color: black;
+    color: white;
+  }
+  
+  .balloon.selected span {
+    color: white;
+  }

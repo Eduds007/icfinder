@@ -29,7 +29,8 @@ class AlunoCreationForm(forms.ModelForm):
     interests = forms.ModelMultipleChoiceField(
         label='Interesses',
         queryset=Interesse.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        required=False
     )
     phone_number = forms.CharField(
         label='Celular',

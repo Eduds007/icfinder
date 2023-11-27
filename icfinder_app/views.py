@@ -6,7 +6,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import AlunoCreationForm, ProfessorCreationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
 from django.views.generic.edit import CreateView, FormView
-from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message
+from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message, Interesse
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -89,7 +89,8 @@ class AlunoRegistrationView(View):
                     curso=form.cleaned_data['curso'],
                 )
 
-                aluno_instance.interests.set(form.cleaned_data['interests'])
+                #aluno_instance.interests.set(form.cleaned_data['interests'])
+                aluno_instance.interests.set([])
 
                 # Atribui senha ao usuário
                 password1 = form.cleaned_data['password1']
@@ -97,11 +98,26 @@ class AlunoRegistrationView(View):
                 user_instance.save()
                 login(request, user_instance)
 
-                return redirect('index')
+                return redirect('interests_selection')
 
         context = {'form': form, 'registration_type': 'student'}
         return render(request, self.template_name, context)
 
+class InterestsSelectionView(View):
+    template_name = 'icfinder_app/interests_selection.html'
+    success_url = reverse_lazy('index')
+
+    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('index')
+        return render(request, self.template_name, {'interests': Interesse.objects.all()})
+
+    def post(self, request, *args, **kwargs):
+        aluno_instance = Aluno.objects.get(user=request.user)
+        aluno_instance.interests.set(request.POST.getlist('interests'))
+        return redirect(self.success_url)
+    
 class ProfessorRegistrationView(FormView):
     template_name = 'icfinder_app/registration.html'
     form_class = ProfessorCreationForm
@@ -236,7 +252,7 @@ class ResetPasswordView(FormView):
                 return redirect(reverse('login'))
             except Users.DoesNotExist:
                 pass
-            
+
         return render(request, self.template_name, {'error': 'Invalid email'})
 
 class ProjectDetailView(generic.DetailView):

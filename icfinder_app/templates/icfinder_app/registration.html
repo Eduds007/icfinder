@@ -14,20 +14,21 @@ Cadastro
     {% if registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
             {% csrf_token %}
-            {% for field in form %}
-            <div class="form-group">
+            {% for field in form.visible_fields %}
+            {% if field.name not in 'interests' %}
+              <div class="form-group">
                 {{ field.label_tag }}
                 {{ field }}
-                {{ field.errors }}
-            </div>
+              </div>
+            {% endif %}
             {% endfor %}
-            <button type="submit">Cadastrar</button>
+            <button type="submit">Continuar</button>
         </form>
     {% elif registration_type == 'professor_registration' %}
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Save</button>
+            <button type="submit">Cadastrar</button>
         </form>
     {% endif %}
 

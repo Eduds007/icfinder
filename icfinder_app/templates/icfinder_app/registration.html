@@ -14,12 +14,14 @@ Cadastro
     {% if registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
             {% csrf_token %}
-            {% for field in form %}
-            <div class="form-group">
+            {% for field in form.visible_fields %}
+            {# Check if the field name is in the list of fields you want to include #}
+            {% if field.name in 'first_name last_name email phone_number' %}
+              <div class="form-group">
                 {{ field.label_tag }}
                 {{ field }}
-                {{ field.errors }}
-            </div>
+              </div>
+            {% endif %}
             {% endfor %}
             <button type="submit">Cadastrar</button>
         </form>

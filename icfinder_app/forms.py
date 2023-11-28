@@ -16,15 +16,18 @@ class CustomAuthenticationForm(AuthenticationForm):
 class AlunoPerfilForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
+        required=False
     )
     last_name = forms.CharField(
         label='Sobrenome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
+        required=False
     )
     email = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email com domínio usp'})
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email com domínio usp'}),
+        required=False
     )
     interests = forms.ModelMultipleChoiceField(
         label='Interesses',
@@ -54,10 +57,15 @@ class AlunoPerfilForm(forms.ModelForm):
         queryset=Curso.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+    profile_pic = forms.URLField(
+        label='Imagem de perfil',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira a URL da imagem'}),
+        required=False
+    )
 
     class Meta:
         model = Aluno
-        fields = ['first_name', 'last_name', 'email', 'interests', 'phone_number', 'short_bio', 'curso']
+        fields = ['first_name', 'last_name', 'email', 'interests', 'phone_number', 'short_bio', 'curso', 'profile_pic']
 
     # aceitar apenas emails no domínio usp
     def clean_email(self):
@@ -93,10 +101,16 @@ class ProfessorPerfilForm(forms.ModelForm):
         label='Confirme a senha',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirme a senha'})
     )
+    profile_pic = forms.URLField(
+        label='Imagem de perfil',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira a URL da imagem'}),
+        required=False
+    )
+
 
     class Meta:
         model = Professor
-        fields = ['first_name', 'last_name', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'profile_pic', 'password1', 'password2']
 
 class ProfessorTokenForm(forms.ModelForm):
     email = forms.EmailField()

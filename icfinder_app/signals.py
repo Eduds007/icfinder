@@ -31,7 +31,7 @@ def create_default_departments(sender, **kwargs):
                                 'Construção', 'Otmização de processos', 'Matemática',
                                 'Análise de dados', 'Hardware', 'Meio ambiente',
                                 'Materiais', 'Energia', 'Inteligência artificial',
-                                'IoT']
+                                'IoT', 'Finanças']
             for interesse in interesses_array:
                 Interesse.objects.create(interesse=interesse)
         if not Lab.objects.exists():

@@ -189,6 +189,7 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
         user_instance = self.request.user
         user_instance.phone_number = form.cleaned_data['phone_number']
         user_instance.short_bio = form.cleaned_data['short_bio']
+        user_instance.profile_pic = form.cleaned_data['profile_pic']
         user_instance.save()
 
         aluno_instance = form.save(commit=False)
@@ -202,6 +203,7 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
         kwargs['initial'] = {
             'phone_number': self.request.user.phone_number,
             'short_bio': self.request.user.short_bio,
+            'profile_pic': self.request.user.profile_pic
         }
         return kwargs
 
@@ -217,6 +219,7 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
         user_instance = self.request.user
         user_instance.phone_number = form.cleaned_data['phone_number']
         user_instance.short_bio = form.cleaned_data['short_bio']
+        user_instance.profile_pic = form.cleaned_data['profile_pic']
         user_instance.save()
 
         professor_instance = form.save(commit=False)
@@ -230,6 +233,7 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
         kwargs['initial'] = {
             'phone_number': self.request.user.phone_number,
             'short_bio': self.request.user.short_bio,
+            'profile_pic': self.request.user.profile_pic
         }
         return kwargs
 

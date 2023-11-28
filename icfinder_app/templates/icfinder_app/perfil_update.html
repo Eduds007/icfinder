@@ -9,8 +9,8 @@ Página de Edição do perfil
 <link rel="stylesheet" type="text/css" href="{% static 'css/style_perfil.css' %}">
 {% endblock pagestyle %}
 {% block content %}
-<h2>Atualizar Dados do Perfil</h2>
 <div class="perfil_form">
+    <h2>Atualizar Dados do Perfil</h2>
     {% if user.aluno %}
     <form method="post">
         {% csrf_token %}

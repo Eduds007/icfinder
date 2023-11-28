@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_delete.css' %}">
+{% endblock pagestyle %}
+
 {% block content %}
 <form action="{% url 'project_delete' projeto.id %}" method="post">
   {% csrf_token %}
+  <div class = "main_content">
   <p>
     Você tem certeza que deseja apagar esse projeto?
   </p>
   <button type="submit">Sim</button>
+  </div>
 </form>
 {% endblock content %}

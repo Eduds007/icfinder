@@ -91,7 +91,7 @@ class Projeto(models.Model):
     lab = models.ForeignKey(Lab, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=64)
     descricao = models.CharField(max_length=255)
-    about = models.CharField(max_length=3000)
+    about = models.CharField(max_length=255)
     vagas = models.IntegerField(default=1)
     bgImg = models.URLField()
     cardImg = models.URLField()

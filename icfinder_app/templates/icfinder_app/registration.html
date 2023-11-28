@@ -11,6 +11,7 @@ Cadastro
 
 {% block content %}
 <body>
+    <div class="registration_form">
     {% if registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
             {% csrf_token %}
@@ -31,6 +32,6 @@ Cadastro
             <button type="submit">Cadastrar</button>
         </form>
     {% endif %}
-
+    </div>
 </body>
 {% endblock content %}

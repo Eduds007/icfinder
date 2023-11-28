@@ -16,15 +16,15 @@ class CustomAuthenticationForm(AuthenticationForm):
 class AlunoCreationForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
     )
     last_name = forms.CharField(
         label='Sobrenome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu sobrenome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'})
     )
     email = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email'})
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email com domínio usp'})
     )
     interests = forms.ModelMultipleChoiceField(
         label='Interesses',
@@ -34,7 +34,7 @@ class AlunoCreationForm(forms.ModelForm):
     )
     phone_number = forms.CharField(
         label='Celular',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular para contato'})
     )
     short_bio = forms.CharField(
         label='Short Bio',
@@ -69,15 +69,15 @@ class AlunoCreationForm(forms.ModelForm):
 class ProfessorCreationForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
     )
     last_name = forms.CharField(
         label='Sobrenome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira seu sobrenome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'})
     )
     phone_number = forms.CharField(
         label='Celular',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your phone number'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular de contato'})
     )
     short_bio = forms.CharField(
         label='Short Bio',
@@ -97,7 +97,7 @@ class ProfessorCreationForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'phone_number', 'short_bio', 'departamento', 'disponibilidade', 'lab', 'password1', 'password2']
 
 class ProfessorTokenForm(forms.ModelForm):
-    email = forms.EmailField()  # Add the email field to the form
+    email = forms.EmailField()
 
     class Meta:
         model = Professor
@@ -110,13 +110,11 @@ class ProfessorTokenForm(forms.ModelForm):
     def save(self, commit=True):
         email = self.cleaned_data['email']
 
-        # Create a new Users instance
-        user_instance = Users.objects.create(email=email)
 
-        # Create a new Professor instance
+        user_instance = Users.objects.create(email=email)
         instance = Professor(user=user_instance)
         instance.token = self.generate_token()
-        instance.login_completed = False  # Set login_completed to False
+        instance.login_completed = False
         user_instance.set_password(instance.token)
 
         if commit:

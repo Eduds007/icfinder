@@ -120,3 +120,7 @@ input[type="password"] {
   .balloon.selected span {
     color: white;
   }
+
+  .registration_form {
+    margin: 40px auto;
+  }

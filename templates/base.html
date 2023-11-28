@@ -19,22 +19,22 @@
 </head>
 
 <body>
-    <header>
-        <nav>
-            <a href="{% url 'login' %}">
-                <div id="homepage-button">
-                    <img src="{% static 'images/logo.svg' %}" alt="Homepage">
-                </div>
+    <header id="base-header">
+        <a href="{% url 'login' %}">
+            <div id="homepage-button">
+                <img src="{% static 'images/logo.svg' %}" alt="Homepage">
+            </div>
+        </a>
+        <nav id="base-nav">
                 <ul>
                     {% if not user.is_authenticated %}
-                    <li><a href="{% url 'login' %}">Log in</a></li>
+                    <li><a href="{% url 'login' %}"> <span class="icon">login</span> Entrar </a></li>
                     {% else %}
-                    <li> Logado com {{ user.first_name }} </li>
-                    <li><a href="{% url 'logout' %}">Log out</a></li>
-                    <li><a href="{% url 'chats' %}">Conversas</a></li>
+                    <li><a href="{% url 'logout' %}"> <span class="icon">logout</span> Sair </a></li>
+                    <li><a href="{% url 'chats' %}"> <span class="icon">chat_bubble</span> Conversas </a></li>
+                    <li> <span class="icon">account_circle</span> {{ user.first_name }} </li>
                     {% endif %}
                 </ul>
-            </a>
         </nav>
     </header>
     <main>

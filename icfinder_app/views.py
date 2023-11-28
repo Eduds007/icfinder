@@ -428,16 +428,17 @@ class ProjectDeleteView(generic.DeleteView):
 @login_required
 def chat(request, receiver_id):
     receiver = get_object_or_404(Users, id=receiver_id)
-    participants = [request.user, receiver]
+    participants = [f'{request.user.id}'+f'{receiver.id}',f'{receiver.id}'+f'{request.user.id}']
     
-
     # Verifica se a conversa já existe entre os participantes
-    conversation = Conversation.objects.filter(participants__in=participants).distinct()
+    conversation = Conversation.objects.filter(conversation_id__in=participants).distinct()
 
     if not conversation.exists():
         conversation = Conversation.objects.create()
-        conversation.participants.set(participants)
+        conversation.participants.set([request.user.id,receiver.id ])
+        conversation.conversation_id = f'{request.user.id}'+f'{receiver.id}'
         conversation.save()
+        conversation = Conversation.objects.filter(conversation_id__in=participants).distinct()
 
     messages = Message.objects.filter(conversation=conversation[0]).order_by('timestamp')
 

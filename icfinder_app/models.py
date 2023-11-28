@@ -133,6 +133,7 @@ def register_project(sender, instance, **kwargs):
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(Users, related_name='conversations')
+    conversation_id = models.CharField(max_length=3)
 
     def __str__(self):
         participants_list =  self.participants.all()

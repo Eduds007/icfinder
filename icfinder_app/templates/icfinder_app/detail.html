@@ -59,7 +59,7 @@ Página do post
     {% for inscrito in inscritos %}
     <div class = "escolha">
         {{ inscrito }}
-        <a id = "Conversar" href = "{% url 'chat' inscrito.id %}" > Conversar </a>
+        <a id = "Conversar" href = "{% url 'chat' inscrito.aluno.user.id %}" > Conversar </a>
         <form method="post" action="{% url 'detail' projeto.id %}">
           {% csrf_token %}
           <button type="submit" name="action" value="aceitar_{{ inscrito.aluno }}">Aceitar</button>

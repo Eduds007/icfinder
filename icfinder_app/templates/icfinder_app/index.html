@@ -50,7 +50,9 @@ Página Inicial
   {% for projeto in projetos %}
     <a href="{% url 'detail' projeto.id %}">
       <div class="card">
-        <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
+        <div class="ImgContainer">
+          <img class="cardImg" src="{{ projeto.cardImg }}" alt="Imagem do projeto">
+        </div>
         <div class="cardText">  
           <h3>{{ projeto.titulo }}</h3>
           <div class="professor">

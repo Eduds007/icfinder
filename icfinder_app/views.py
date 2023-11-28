@@ -372,9 +372,7 @@ class ProjectDetailView(generic.DetailView):
          
         elif action.startswith('aceitar_'):
             user_email = action.split('_')[1]
-            print(user_email)
             user = Users.objects.filter(email = user_email).first()
-            print(user)
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'aceito'
@@ -384,8 +382,8 @@ class ProjectDetailView(generic.DetailView):
 
 
         elif action.startswith('recusar_'):
-            user_id = action.split('_')[1]
-            user = Users.objects.filter(id = user_id).first()
+            user_email = action.split('_')[1]
+            user = Users.objects.filter(email = user_email).first()
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'recusado'

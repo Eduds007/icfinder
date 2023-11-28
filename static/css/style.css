@@ -4,11 +4,13 @@
 }
 
 .icon {
-    color: white;
+    color: black;
     font-size: 24px;
     font-family: 'Material Icons';
     font-weight: 400;
     vertical-align: middle;
+    width: 25px;
+    height: 25px;
   }
 
 #homepage-button img {

@@ -11,7 +11,8 @@ Página do post
     
 {% block content %}
   <div class = 'main_content'>
-    <img class = 'bgImg' src= "{{ projeto.bgImg }}" alt="bgImg">
+    <div class="img-container" style="background-image: url('{{ projeto.bgImg}}');">
+    </div>
     <div class = 'titulo'> <p>{{ projeto }}</p> </div>
     
 
@@ -22,34 +23,55 @@ Página do post
       
       </div>
 
+      <div class="perfil-container">
+        <div id = "perfil">
+          <div class="profile-pic-container">
+            <img class = 'img-class' src= "{{ projeto.responsavel.user.profile_pic }}" alt="profile_pic">
+          </div>
+          <div id = "perfil_inner">
+            <div class="desc-line">
+              <span class="icon">badge</span> 
+              <p>{{projeto.responsavel.user.first_name}} {{projeto.responsavel.user.last_name}}</p>
+            </div>
+            <div class="desc-line">
+              <span class="icon">mail</span> 
+              <p>{{projeto.responsavel.user.email}}</p>
+            </div>
+            <div class="desc-line">
+              <span class="icon">call</span> 
+              <p>{{projeto.responsavel.user.phone_number}}</p>
+            </div>
+            <div class="desc-line">
 
-      <div id = "perfil">
-        <div id = "perfil_inner">
-        <p>{{projeto.responsavel.user.first_name}} {{projeto.responsavel.user.last_name}}</p>
-        <p>{{projeto.responsavel.user.email}}</p>
-        <p>{{projeto.responsavel.user.phone_number}}</p>
-        <p>{{projeto.responsavel.user.disponibilidade}}</p>
-        <p>{{projeto.lab}}</p>
-        
-
-        {% if user.professor %}
-          {% if projeto.responsavel.disponibilidade %}
-          <p class = "Disponível">Disponível para chat</p>
-          {% else %}
-          <p class = "Indisponível">Indisponível</p>
-          {% endif %}
-        {% endif %}
-        
-        {% if user.aluno %}
-          {% if projeto.responsavel.disponibilidade %}
-          <a class = "Disponível" href = "{% url 'chat' projeto.responsavel.user.id %}" > Disponível para chat</a>
-          {% else %}
-          <p class = "Indisponível">Indisponível</p>
-          {% endif %}
-        {% endif %}
-        
+              <span class="icon">business_benter</span> 
+              <p>{{projeto.lab}}</p>
+            </div>
+              
+            
+            <div class="desc-line">
+              <span class="icon">chat</span> 
+              {% if user.professor %}
+              {% if projeto.responsavel.disponibilidade %}
+              <p class = "Disponível">Disponível para chat</p>
+              {% else %}
+              <p class = "Indisponível">Indisponível</p>
+              {% endif %}
+              
+              {% endif %}
+              
+              {% if user.aluno %}
+                {% if projeto.responsavel.disponibilidade %}
+                <a class = "Disponível" href = "{% url 'chat' projeto.responsavel.user.id %}" > Disponível para chat</a>
+                {% else %}
+                <p class = "Indisponível">Indisponível</p>
+                {% endif %}
+                {% endif %}
+              </div>
+          
+            </div>
+          </div>
+  
         </div>
-
       </div>
     </div>
     {% if user.professor %}

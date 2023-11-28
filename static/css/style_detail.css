@@ -1,13 +1,4 @@
 
-
-.bgImg{
-    width: 100%;
-    height: auto;
-    flex-shrink: 0;
-    align-self: stretch;
-    background: url(<path-to-image>), lightgray 50% / cover no-repeat;
-}
-
 main{
     flex-direction: column;
     justify-content: center;
@@ -21,9 +12,8 @@ main{
     align-self: stretch;
     color: var(--preto, #000);
 
-    font-family: ABeeZee;
+    font-family: Arial, Helvetica;
     font-size: 36px;
-    font-style: italic;
     font-weight: 400;
     line-height: normal;
 
@@ -59,33 +49,22 @@ gap: 10px;
     flex: 1 0 0;
     align-self: stretch;
     background: var(--branco, #FFF);
+    flex-grow: 0.5;
 }
 
 #perfil{
 display: flex;
-width: 620px;
 flex-direction: column;
 justify-content: center;
 align-items: center;
 gap: 50px;
 align-self: stretch;
-padding: 24px 48px;
+margin: 5rem;
 border-radius: 8px;
 background: var(--branco, #FFF);
-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+box-shadow: 4px 4px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-/* #perfi_inner{
-    display: flex;
-    padding: 24px 48px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;
-    border-radius: 8px;
-    background: var(--branco, #FFF);
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-} */
 
 .meio{
     display:flex;
@@ -113,23 +92,6 @@ button{
     margin-left: 5px;
     margin-right: 5px;
 }
-/* button{
-display: flex;
-padding: 12px;
-justify-content: center;
-align-items: center;
-gap: 10px;
-
-border-radius: 8px;
-background: #292D32;
-
-color: var(--branco, #FFF);
-font-family: ABeeZee;
-font-size: 24px;
-font-style: italic;
-font-weight: 400;
-line-height: normal;
-} */
 
 
 .Disponível{
@@ -153,3 +115,48 @@ line-height: normal;
 #Conversar:hover{
     background-color: lightgrey;
 }
+
+
+.profile-pic-container {
+    width: 250px;
+    border-radius: 125px;
+    height: 250px;
+    overflow: hidden;
+    margin-top: 1rem;
+    background-color: rgb(100, 100, 100);
+}
+
+.img-class {
+    width: 100%;
+    height: auto;
+}
+
+.perfil-container {
+    flex-grow: 0.5;
+}
+
+
+.desc-line {
+    display: flex;
+    gap: 1rem;
+    
+}
+
+.desc-line p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#perfil_inner {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+.img-container {
+    height: 30vh;
+    background-size: auto 100%;
+    
+}
+

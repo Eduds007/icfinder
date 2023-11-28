@@ -103,14 +103,11 @@ class AlunoRegistrationView(View):
         context = {'form': form, 'registration_type': 'student'}
         return render(request, self.template_name, context)
 
-class InterestsSelectionView(View):
+class InterestsSelectionView(LoginRequiredMixin, View):
     template_name = 'icfinder_app/interests_selection.html'
     success_url = reverse_lazy('index')
 
-    @method_decorator(cache_control(no_cache=True, must_revalidate=True, no_store=True), name='dispatch')
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('index')
         return render(request, self.template_name, {'interests': Interesse.objects.all()})
 
     def post(self, request, *args, **kwargs):

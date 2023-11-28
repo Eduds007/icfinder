@@ -1,6 +1,6 @@
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from .models import Curso, Departamento, Lab
+from .models import Curso, Departamento, Interesse, Lab
 
 @receiver(post_migrate)
 def create_default_departments(sender, **kwargs):
@@ -26,6 +26,14 @@ def create_default_departments(sender, **kwargs):
                                     "PMR - Mecatrônica e Sist. Mecânicos"]
             for departamento in departamentos_array:
                 Departamento.objects.create(departamento=departamento)
+        if not Interesse.objects.exists():
+            interesses_array = ['Saúde', 'Programação', 'Automação', 'Robótica',
+                                'Construção', 'Otmização de processos', 'Matemática',
+                                'Análise de dados', 'Hardware', 'Meio ambiente',
+                                'Materiais', 'Energia', 'Inteligência artificial',
+                                'IoT']
+            for interesse in interesses_array:
+                Interesse.objects.create(interesse=interesse)
         if not Lab.objects.exists():
             nomes_lab_array = ['Laboratório de Ensino de CAD',
                                 'Laboratório de Ensino Experimental',

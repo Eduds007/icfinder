@@ -2,19 +2,26 @@
 {% load static %}
 
 {% block title %}
-Página Inicial
+Enviar token
 {% endblock title %}
 
 {% block pagestyle %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/style_login.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_register.css' %}">
 {% endblock pagestyle %}
 
 {% block content %}
 <body>
-    <form method="post" action="{% url 'send_token' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
+    <div class="registration_form">
+        <form method="post" action="{% url 'send_token' %}">
+            {% csrf_token %}
+            {% for field in form.visible_fields %}
+              <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+              </div>
+            {% endfor %}
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
 </body>
 {% endblock content %}

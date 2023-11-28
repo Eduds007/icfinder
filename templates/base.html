@@ -30,6 +30,7 @@
                     <li> Logado com {{ user.first_name }} </li>
                     <li><a href="{% url 'logout' %}">Log out</a></li>
                     <li><a href="{% url 'chats' %}">Conversas</a></li>
+                    <li><a href="{% url 'perfil_detail' pk=user.pk %}">Meu Perfil</a></li>
                     {% endif %}
                 </ul>
             </a>

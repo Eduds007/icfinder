@@ -12,33 +12,83 @@ Página do post
 {% block content %}
   <div class = 'main_content'>
     <img class = 'bgImg' src= "{{ projeto.bgImg }}" alt="bgImg">
-    <div class = 'titulo'> <h1>{{ projeto }}</h1> </div>
+    <div class = 'titulo'> <p>{{ projeto }}</p> </div>
     
-    <div class = 'desc_about'>
-    <p>{{ projeto.descricao }}</p>
-    <p>{{ projeto.about }}</p>
+
+    <div class = 'meio'>
+      <div class = 'desc_about'>
+      <p>{{ projeto.descricao }}</p>
+      <p>{{ projeto.about }}</p>
+      
+      </div>
+
+
+      <div id = "perfil">
+        <div id = "perfil_inner">
+        <p>{{projeto.responsavel.user.first_name}} {{projeto.responsavel.user.last_name}}</p>
+        <p>{{projeto.responsavel.user.email}}</p>
+        <p>{{projeto.responsavel.user.phone_number}}</p>
+        <p>{{projeto.responsavel.user.disponibilidade}}</p>
+        <p>{{projeto.lab}}</p>
+        
+
+        {% if user.professor %}
+          {% if projeto.responsavel.disponibilidade %}
+          <p class = "Disponível">Disponível para chat</p>
+          {% else %}
+          <p class = "Indisponível">Indisponível</p>
+          {% endif %}
+        {% endif %}
+        
+        {% if user.aluno %}
+          {% if projeto.responsavel.disponibilidade %}
+          <a class = "Disponível" href = "{% url 'chat' projeto.responsavel.user.id %}" > Disponível para chat</a>
+          {% else %}
+          <p class = "Indisponível">Indisponível</p>
+          {% endif %}
+        {% endif %}
+        
+        </div>
+
+      </div>
     </div>
     {% if user.professor %}
+    <div class = 'secao_alunos'>
+    {% if inscritos %}
     <p>Alunos interessados</p>
     {% for inscrito in inscritos %}
+    <div class = "escolha">
         {{ inscrito }}
+        <a id = "Conversar" href = "{% url 'chat' inscrito.id %}" > Conversar </a>
         <form method="post" action="{% url 'detail' projeto.id %}">
           {% csrf_token %}
           <button type="submit" name="action" value="aceitar_{{ inscrito.aluno }}">Aceitar</button>
           <button type="submit" name="action" value="recusar_{{ inscrito.aluno }}">Recusar</button>
         </form>
-    
+    </div>
     {% endfor %}
-    <a href="{% url 'project_update' projeto.id %}">Editar projeto</a>
-    <a href="{% url 'project_delete' projeto.id %}">Deletar projeto</a>
+    {% else %}
+    <p>Nenhum candidato se inscreveu ainda</p>
+    {% endif %}
+    </div>
+
+    <div class = 'edit_delete'>
+    <p class = "ref"> Vagas: {{ projeto.vagas }}</p> 
+    <a class="ref" href="{% url 'project_update' projeto.id %}">Editar projeto</a>
+    <a class ="ref" href="{% url 'project_delete' projeto.id %}">Deletar projeto</a>
+
+    </div>
+    
     {% elif user.aluno %}
+    <div class = 'secao_alunos'>
       {% if inscricao_estado == 'pendente' or  inscricao_estado == 'aceito' %}
-      {{ inscricao_estado }}
+      <p> Minha situação: {{ inscricao_estado }} </p>
       {% else %}
       <form method="post" action="{% url 'detail' projeto.id %}">
           {% csrf_token %}
           <button  type="submit" name="action" value="inscrever">Inscrever-se</button>
         </form>
+    </div>
       {% endif %}
     {% endif %}
   </div>

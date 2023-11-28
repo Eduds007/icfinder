@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Página de perfil
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_perfil.css' %}">
+{% endblock pagestyle %}
+    
+{% block content %}
+  <div class = 'main_content'>
+
+    <h1 id = "título">Seu perfil</h1>
+    <div class="gerais"> 
+      <p>{{user.first_name}} {{user.last_name}}</p>
+      <p>{{user.email}}</p>
+      <p>{{user.phone_number}}</p>
+      
+      {% if user.professor %}
+        <p>{{user.professor.departamento}}</p>
+        {% if user.professor.disponibilidade %}
+        <p id = "Disponível">Disponível para chat</p>
+        {% else%}
+        <p id = "Indisponível">Indisponível</p>
+        {% endif %}
+      {% endif %}
+
+      {% if user.aluno %}
+        <p>{{user.aluno.curso}}</p>
+      {% endif %}
+
+    </div>
+
+    <div class = "short_bio">
+      <h2 id = "short_bio_titulo">Descrição</h2>
+      <p class = "box_text">{{user.short_bio}}</p>
+    </div>
+
+
+    {% if user.professor %}
+    <div class="professor">
+
+      <h2>Laboratórios:</h2>
+      <div class = "box_text">
+        {% for lab in user.professor.lab.all %}
+        <p>{{lab}}</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <a class = "button_edit" href="{% url 'perfil_professor_update' user.id %}">Editar perfil</a>
+
+    {% elif user.aluno %}
+    <h2>Interesses:</h2>
+    <div class = "box_text">
+      {% for interest in user.aluno.interests.all %}
+      <p>{{interest}}</p>
+      {% endfor %}
+    </div>
+
+    <a class = "button_edit" href = "{% url 'perfil_aluno_update' user.id %}">Editar perfil</a>
+    {% endif %}
+  </div>
+{% endblock %}

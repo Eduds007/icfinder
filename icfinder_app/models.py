@@ -55,11 +55,10 @@ class Users(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     profile_pic = models.URLField(null=True)
-    username = models.CharField(max_length=30, unique=True)
     
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):

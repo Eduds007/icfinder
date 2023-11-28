@@ -31,8 +31,9 @@ class CustomLoginView(LoginView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        user = form.get_user()
+        response = super().form_valid(form)
 
+        user = self.request.user
         professor = Professor.objects.filter(
             user__email=user.email,
             login_completed=False
@@ -42,8 +43,7 @@ class CustomLoginView(LoginView):
             self.request.session['validated_email'] = user.email
             return redirect('registration_professor', professor_id=professor.id)
 
-        login(self.request, user)
-        return super().form_valid(form)
+        return response
 
     def get_success_url(self):
         return reverse_lazy('index')
@@ -82,7 +82,6 @@ class AlunoRegistrationView(View):
                     email=form.cleaned_data['email'],
                     phone_number=form.cleaned_data['phone_number'],
                     short_bio=form.cleaned_data['short_bio'],
-                    username=form.cleaned_data['email']
                 )
 
                 aluno_instance = Aluno.objects.create(

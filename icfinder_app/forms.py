@@ -24,11 +24,6 @@ class AlunoPerfilForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
         required=False
     )
-    username = forms.CharField(
-        label='Nome de usuário',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
-        required=False
-    )
     email = forms.EmailField(
         label='Email',
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email com domínio usp'}),
@@ -90,11 +85,6 @@ class ProfessorPerfilForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
         required=False
     )
-    username = forms.CharField(
-        label='Nome de usuário',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
-        required=False
-    )
     phone_number = forms.CharField(
         label='Celular',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular de contato'})
@@ -137,7 +127,7 @@ class ProfessorTokenForm(forms.ModelForm):
         email = self.cleaned_data['email']
 
 
-        user_instance = Users.objects.create(email=email, username=email)
+        user_instance = Users.objects.create(email=email)
         instance = Professor(user=user_instance)
         instance.token = self.generate_token()
         instance.login_completed = False

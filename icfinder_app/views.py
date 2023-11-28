@@ -395,8 +395,27 @@ class ProjectUpdateView(generic.UpdateView):
     template_name = 'icfinder_app/update.html'
     form_class = ProjetoForm
 
-    def get_success_url(self):
-        return reverse('detail', kwargs={'pk': self.object.pk})
+    def form_valid(self, form):
+        projeto_instance = self.object
+        projeto_instance.lab=form.cleaned_data['lab']
+        projeto_instance.titulo=form.cleaned_data['titulo']
+        projeto_instance.descricao=form.cleaned_data['descricao']
+        projeto_instance.about=form.cleaned_data['about']
+        projeto_instance.vagas=form.cleaned_data['vagas']
+        projeto_instance.bgImg=form.cleaned_data['bgImg']
+        projeto_instance.cardImg=form.cleaned_data['cardImg']
+        projeto_instance.save()
+
+        return redirect('detail', pk=self.object.pk)
+
+    def get_form_kwargs(self):
+        kwargs = super(ProjectUpdateView, self).get_form_kwargs()
+        kwargs['initial'] = {
+            'titulo': self.object.titulo,
+            'descricao': self.object.descricao,
+            'about': self.object.descricao
+        }
+        return kwargs
     
 
 class ProjectCreateView(generic.CreateView):

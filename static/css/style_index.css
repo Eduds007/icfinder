@@ -347,6 +347,7 @@ select {
   list-style-type: none;
   border-radius: 12px;
   margin-top: 4px;
+  z-index: 1;
 }
 
 .dd-input + .dd-menu {

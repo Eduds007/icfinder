@@ -12,28 +12,14 @@ Página de Edição do perfil
 <h2>Atualizar Dados do Perfil</h2>
 <form method="POST">
   {% csrf_token %}
-
-  
-  
-  <!-- {{ form.as_p }} -->
-
-  <!--{{ form.departamento }}                #nao ta atualizando os campos e nem volta pra pagina de detail
-  {{ form.disponibilidade }}
-  {{ form.lab }} -->
-
-    <!-- #nao ta atualizando os campos e nem volta pra pagina de detail -->
-    
-    {% for field in form.visible_fields %}      
-    {% if field.name in 'email phone_number short_bio departamento lab' %}
+  {% for field in form.visible_fields %}      
+    {% if field.name not in 'first_name last_name' %}
       <div class="form-group">
         {{ field.label_tag }}
         {{ field }}
       </div>
     {% endif %}
-    {% endfor %}
-
-
-
+  {% endfor %}
   <button type="submit">Atualizar</button>
 </form>
 {% endblock content %}

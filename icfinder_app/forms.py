@@ -13,7 +13,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
-class AlunoCreationForm(forms.ModelForm):
+class AlunoPerfilForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
@@ -60,20 +60,22 @@ class AlunoCreationForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'email', 'interests', 'phone_number', 'short_bio', 'curso']
 
     # aceitar apenas emails no domínio usp
-    #def clean_email(self):
-    #    email = self.cleaned_data.get('email')
-    #    if email and not email.endswith('@usp.br'):
-    #        raise ValidationError("Insira seu email USP.")
-    #    return email
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and not email.endswith('@usp.br'):
+            raise ValidationError("Insira seu email USP.")
+        return email
 
-class ProfessorCreationForm(forms.ModelForm):
+class ProfessorPerfilForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
+        required=False
     )
     last_name = forms.CharField(
         label='Sobrenome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
+        required=False
     )
     phone_number = forms.CharField(
         label='Celular',
@@ -125,44 +127,3 @@ class ProfessorTokenForm(forms.ModelForm):
 
 class MessageForm(forms.Form):
     content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Type your message...'}))
-
-
-
-class PerfilEditForm(forms.ModelForm):
-    # Campos específicos do Aluno
-    interests = forms.ModelMultipleChoiceField(
-        label='Interesses',
-        queryset=Interesse.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        required = False
-    )
-    curso = forms.ModelChoiceField(
-        label='Curso',
-        queryset=Curso.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required = False
-    )
-
-    # Campos específicos do Professor
-    departamento = forms.ModelChoiceField(
-        label='Departamento',
-        queryset=Departamento.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required = False
-    )
-    disponibilidade = forms.BooleanField(
-        label='Disponibilidade',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        required = False
-    )
-    lab = forms.ModelMultipleChoiceField(
-        label='Laboratórios',
-        queryset=Lab.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        required = False
-    )
-
-    class Meta:
-        model = Users
-        fields = ['phone_number', 'short_bio', 'interests', 'curso', 'departamento', 'disponibilidade','lab']
-

@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils import timezone
+from django.conf import settings
 
 class Interesse(models.Model):
     interesse = models.CharField(max_length=100)
@@ -42,7 +42,8 @@ class BaseModel(models.Model):
         abstract = True
 
 class Professor(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               on_delete=models.CASCADE)
     departamento = models.ForeignKey(Departamento, null=True, on_delete=models.CASCADE)
     disponibilidade = models.BooleanField(default=True)
     lab = models.ManyToManyField(Lab)
@@ -68,7 +69,8 @@ class Projeto(models.Model):
         return self.titulo
 
 class Aluno(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               on_delete=models.CASCADE)
     interests = models.ManyToManyField(Interesse, blank=True)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     projeto = models.ManyToManyField(Projeto, blank=True)
@@ -100,7 +102,7 @@ def register_project(sender, instance, **kwargs):
 
 
 class Conversation(models.Model):
-    participants = models.ManyToManyField(User, related_name='conversations')
+    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='conversations')
     conversation_id = models.CharField(max_length=3)
 
     def __str__(self):
@@ -110,7 +112,7 @@ class Conversation(models.Model):
 
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 

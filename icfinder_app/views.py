@@ -146,8 +146,6 @@ class ProfessorRegistrationView(FormView):
         # Atualiza com os dados faltantes de usuário
         user_instance.first_name = form.cleaned_data['first_name']
         user_instance.last_name = form.cleaned_data['last_name']
-        user_instance.phone_number = form.cleaned_data['phone_number']
-        user_instance.short_bio = form.cleaned_data['short_bio']
         user_instance.save()
 
         # Atualiza os atributos agora com um professor com registro completo
@@ -157,6 +155,8 @@ class ProfessorRegistrationView(FormView):
         professor_instance.lab.set(form.cleaned_data['lab'])
         professor_instance.token = None
         professor_instance.login_completed = True
+        professor_instance.phone_number = form.cleaned_data['phone_number']
+        professor_instance.short_bio = form.cleaned_data['short_bio']
         professor_instance.save()
 
         # Atribui a senha ao usuário
@@ -188,14 +188,10 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user.aluno
     
     def form_valid(self, form):
-        user_instance = self.request.user
-        user_instance.phone_number = form.cleaned_data['phone_number']
-        user_instance.short_bio = form.cleaned_data['short_bio']
-        user_instance.profile_pic = form.cleaned_data['profile_pic']
-        user_instance.save()
-
         aluno_instance = form.save(commit=False)
-        aluno_instance.user = user_instance
+        aluno_instance.phone_number = form.cleaned_data['phone_number']
+        aluno_instance.short_bio = form.cleaned_data['short_bio']
+        aluno_instance.profile_pic = form.cleaned_data['profile_pic']
         aluno_instance.save()
 
         return redirect('perfil_detail', pk=self.request.user.id)
@@ -203,9 +199,9 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super(AlunoUpdateView, self).get_form_kwargs()
         kwargs['initial'] = {
-            'phone_number': self.request.user.phone_number,
-            'short_bio': self.request.user.short_bio,
-            'profile_pic': self.request.user.profile_pic
+            'phone_number': self.request.user.aluno.phone_number,
+            'short_bio': self.request.user.aluno.short_bio,
+            'profile_pic': self.request.user.aluno.profile_pic
         }
         return kwargs
 
@@ -218,14 +214,10 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user.professor
 
     def form_valid(self, form):
-        user_instance = self.request.user
-        user_instance.phone_number = form.cleaned_data['phone_number']
-        user_instance.short_bio = form.cleaned_data['short_bio']
-        user_instance.profile_pic = form.cleaned_data['profile_pic']
-        user_instance.save()
-
         professor_instance = form.save(commit=False)
-        professor_instance.user = user_instance
+        professor_instance.phone_number = form.cleaned_data['phone_number']
+        professor_instance.short_bio = form.cleaned_data['short_bio']
+        professor_instance.profile_pic = form.cleaned_data['profile_pic']
         professor_instance.save()
 
         return redirect('perfil_detail', pk=self.request.user.id)
@@ -233,9 +225,9 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super(ProfessorUpdateView, self).get_form_kwargs()
         kwargs['initial'] = {
-            'phone_number': self.request.user.phone_number,
-            'short_bio': self.request.user.short_bio,
-            'profile_pic': self.request.user.profile_pic
+            'phone_number': self.request.user.professor.phone_number,
+            'short_bio': self.request.user.professor.short_bio,
+            'profile_pic': self.request.user.professor.profile_pic
         }
         return kwargs
 

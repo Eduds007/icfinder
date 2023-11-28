@@ -15,13 +15,17 @@ Página de perfil
     <h1 id = "título">Seu perfil</h1>
     <div class="gerais"> 
       <div class="profile-pic-container">
-        <img class = 'bgImg' src= "{{ user.profile_pic }}" alt="bgImg">
+        {% if user.professor %}
+        <img class = 'bgImg' src= "{{ user.professor.profile_pic }}" alt="bgImg">
+        {% elif user.aluno %}
+        <img class = 'bgImg' src= "{{ user.aluno.profile_pic }}" alt="bgImg">
+        {% endif %}
       </div>
       <p>{{user.first_name}} {{user.last_name}}</p>
       <p>{{user.email}}</p>
-      <p>{{user.phone_number}}</p>
       
       {% if user.professor %}
+        <p>{{user.professor.phone_number}}</p>
         <p>{{user.professor.departamento}}</p>
         {% if user.professor.disponibilidade %}
         <p id = "Disponível">Disponível para chat</p>
@@ -31,6 +35,7 @@ Página de perfil
       {% endif %}
 
       {% if user.aluno %}
+        <p>{{user.aluno.phone_number}}</p>
         <p>{{user.aluno.curso}}</p>
       {% endif %}
 
@@ -38,7 +43,11 @@ Página de perfil
 
     <div class = "short_bio">
       <h2 id = "short_bio_titulo">Descrição</h2>
-      <p class = "box_text">{{user.short_bio}}</p>
+      {% if user.aluno %}
+      <p class = "box_text">{{user.aluno.short_bio}}</p>
+      {% elif user.professor %}
+      <p class = "box_text">{{user.professor.short_bio}}</p>
+      {% endif %}
     </div>
 
 

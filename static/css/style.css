@@ -3,6 +3,14 @@
     margin: 0;
 }
 
+.icon {
+    color: white;
+    font-size: 24px;
+    font-family: 'Material Icons';
+    font-weight: 400;
+    vertical-align: middle;
+  }
+
 #homepage-button img {
     height: 50px;
     width: auto;

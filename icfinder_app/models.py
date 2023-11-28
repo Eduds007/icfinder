@@ -53,6 +53,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
     short_bio = models.CharField(max_length=225, null=True)
     is_admin = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
+    profile_pic = models.URLField(null=True)
     
     objects = CustomUserManager()
 

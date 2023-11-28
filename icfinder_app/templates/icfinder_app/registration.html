@@ -11,27 +11,27 @@ Cadastro
 
 {% block content %}
 <body>
+    <div class="registration_form">
     {% if registration_type == 'student' %}
         <form method="post" action="{% url 'registration_student' %}">
             {% csrf_token %}
             {% for field in form.visible_fields %}
-            {# Check if the field name is in the list of fields you want to include #}
-            {% if field.name in 'first_name last_name email phone_number' %}
+            {% if field.name not in 'interests' %}
               <div class="form-group">
                 {{ field.label_tag }}
                 {{ field }}
               </div>
             {% endif %}
             {% endfor %}
-            <button type="submit">Cadastrar</button>
+            <button type="submit">Continuar</button>
         </form>
     {% elif registration_type == 'professor_registration' %}
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Save</button>
+            <button type="submit">Cadastrar</button>
         </form>
     {% endif %}
-
+    </div>
 </body>
 {% endblock content %}

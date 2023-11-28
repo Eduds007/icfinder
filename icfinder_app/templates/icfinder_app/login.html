@@ -40,7 +40,11 @@ Login
                 Cadastrar-se
               </a>
             </div>
-            <div class="button">Esqueci minha senha</div>
+            <div class="button">
+              <a href="{% url 'reset_password' %}">
+                Esqueci minha senha
+              </a>
+            </div>
           </div>
           <div class="login-button">
             <button type="submit">

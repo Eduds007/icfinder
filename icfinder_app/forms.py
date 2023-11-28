@@ -1,16 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Users, Professor, Aluno, Interesse, Curso, Projeto
+from .models import Professor, Aluno, Interesse, Curso, Projeto
 import secrets
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 class CustomAuthenticationForm(AuthenticationForm):
     widgets = {
-        'email': forms.EmailInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Email usp'}),
+        'username': forms.TextInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Email usp'}),
         'password': forms.PasswordInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Senha' }),
     }
 
-    email = forms.EmailField(widget=widgets['email'])
+    username = forms.CharField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
 class AlunoPerfilForm(forms.ModelForm):
@@ -126,8 +127,7 @@ class ProfessorTokenForm(forms.ModelForm):
     def save(self, commit=True):
         email = self.cleaned_data['email']
 
-
-        user_instance = Users.objects.create(email=email)
+        user_instance = User.objects.create(email=email)
         instance = Professor(user=user_instance)
         instance.token = self.generate_token()
         instance.login_completed = False

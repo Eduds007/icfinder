@@ -137,7 +137,7 @@ class ProfessorTokenForm(forms.ModelForm):
         email = self.cleaned_data['email']
 
 
-        user_instance = Users.objects.create(email=email)
+        user_instance = Users.objects.create(email=email, username=email)
         instance = Professor(user=user_instance)
         instance.token = self.generate_token()
         instance.login_completed = False

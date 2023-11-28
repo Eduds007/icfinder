@@ -52,8 +52,8 @@ class Users(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, null=True)
     short_bio = models.CharField(max_length=225, null=True)
-    is_admin = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     profile_pic = models.URLField(null=True)
     
     objects = CustomUserManager()
@@ -149,5 +149,5 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.sender.username} in {self.conversation.id} at {self.timestamp}"
+        return f"{self.conversation.id} at {self.timestamp}"
 

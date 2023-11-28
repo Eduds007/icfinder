@@ -6,11 +6,11 @@ from django.core.exceptions import ValidationError
 
 class CustomAuthenticationForm(AuthenticationForm):
     widgets = {
-        'email': forms.EmailInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Email usp'}),
+        'username': forms.EmailInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Email usp'}),
         'password': forms.PasswordInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Senha' }),
     }
 
-    email = forms.EmailField(widget=widgets['email'])
+    username = forms.EmailField(widget=widgets['username'])
     password = forms.CharField(widget=widgets['password'])
 
 class AlunoPerfilForm(forms.ModelForm):
@@ -22,6 +22,11 @@ class AlunoPerfilForm(forms.ModelForm):
     last_name = forms.CharField(
         label='Sobrenome',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
+        required=False
+    )
+    username = forms.CharField(
+        label='Nome de usuário',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
         required=False
     )
     email = forms.EmailField(
@@ -83,6 +88,11 @@ class ProfessorPerfilForm(forms.ModelForm):
     last_name = forms.CharField(
         label='Sobrenome',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
+        required=False
+    )
+    username = forms.CharField(
+        label='Nome de usuário',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
         required=False
     )
     phone_number = forms.CharField(

@@ -16,7 +16,7 @@ Cadastro
         <form method="post" action="{% url 'registration_student' %}">
             {% csrf_token %}
             {% for field in form.visible_fields %}
-            {% if field.name not in 'interests profile_pic' %}
+            {% if field.name not in 'username interests profile_pic' %}
               <div class="form-group">
                 {{ field.label_tag }}
                 {{ field }}
@@ -29,7 +29,7 @@ Cadastro
         <form method="post">
             {% csrf_token %}
             {% for field in form.visible_fields %}
-            {% if field.name not in 'profile_pic' %}
+            {% if field.name not in 'username profile_pic' %}
               <div class="form-group">
                 {{ field.label_tag }}
                 {{ field }}

@@ -15,7 +15,7 @@ Página de Edição do perfil
     <form method="post">
         {% csrf_token %}
         {% for field in form.visible_fields %}
-        {% if field.name not in 'email first_name last_name' %}
+        {% if field.name not in 'username email first_name last_name' %}
         <div class="form-group">
             {{ field.label_tag }}
             {{ field }}
@@ -28,7 +28,7 @@ Página de Edição do perfil
     <form method="post">
         {% csrf_token %}
         {% for field in form.visible_fields %}      
-        {% if field.name not in 'first_name last_name' %}
+        {% if field.name not in 'username first_name last_name' %}
         <div class="form-group">
             {{ field.label_tag }}
             {{ field }}

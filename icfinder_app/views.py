@@ -179,19 +179,35 @@ class PerfilDetailView(LoginRequiredMixin, View):
 
 class AlunoUpdateView(LoginRequiredMixin, UpdateView):
     model = Aluno
-    template_name = 'icfinder_app/perfil_aluno_update.html'
-    # fields = ['interests', 'curso']
+    template_name = 'icfinder_app/perfil_update.html'
     form_class = AlunoPerfilForm
 
     def get_object(self, queryset=None):
         return self.request.user.aluno
     
-    def get_success_url(self):
-        return reverse_lazy('perfil_detail', kwargs={'pk': self.request.user.id})
+    def form_valid(self, form):
+        user_instance = self.request.user
+        user_instance.phone_number = form.cleaned_data['phone_number']
+        user_instance.short_bio = form.cleaned_data['short_bio']
+        user_instance.save()
+
+        aluno_instance = form.save(commit=False)
+        aluno_instance.user = user_instance
+        aluno_instance.save()
+
+        return redirect('perfil_detail', pk=self.request.user.id)
+
+    def get_form_kwargs(self):
+        kwargs = super(AlunoUpdateView, self).get_form_kwargs()
+        kwargs['initial'] = {
+            'phone_number': self.request.user.phone_number,
+            'short_bio': self.request.user.short_bio,
+        }
+        return kwargs
 
 class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     model = Professor
-    template_name = 'icfinder_app/perfil_professor_update.html'  
+    template_name = 'icfinder_app/perfil_update.html'  
     form_class = ProfessorPerfilForm
 
     def get_object(self, queryset=None):
@@ -217,29 +233,6 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
         }
         return kwargs
 
-#tentando com views funcionais
-
-#O CÓDIGO ABAIXO ESTÁ INACABADO
-
-# def ProfessorUpdateView(request, professor_id):
-
-#     if request.method == "POST":
-#         form = PerfilEditForm(request.POST)
-#         if form.is_valid():
-#             Professor = PerfilEditForm.objects.get(id=professor_id)
-#             Professor.departamento = request.POST['departamento']
-#             Professor.disponibilidade = request.POST['disponibilidade']
-#             Professor.lab = request.POST['lab']
-
-#             Professor.save()
-#             return HttpResponseRedirect(
-#                 reverse('posts:detail', args=(Professor.id, )))
-
-#     else:
-#         form = PostForm()
-#         context = {'form': form}
-#         return render(request, 'posts/update.html', context)
-    
 class Index(LoginRequiredMixin, FilterView):
     model = Projeto
     template_name = 'icfinder_app/index.html'

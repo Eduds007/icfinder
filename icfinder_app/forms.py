@@ -16,15 +16,18 @@ class CustomAuthenticationForm(AuthenticationForm):
 class AlunoPerfilForm(forms.ModelForm):
     first_name = forms.CharField(
         label='Nome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
+        required=False
     )
     last_name = forms.CharField(
         label='Sobrenome',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
+        required=False
     )
     email = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email com domínio usp'})
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Seu email com domínio usp'}),
+        required=False
     )
     interests = forms.ModelMultipleChoiceField(
         label='Interesses',

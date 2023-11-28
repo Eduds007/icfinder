@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Página de Edição do perfil
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_perfil.css' %}">
+{% endblock pagestyle %}
+{% block content %}
+<h2>Atualizar Dados do Perfil</h2>
+<div class="perfil_form">
+    {% if user.aluno %}
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+        {% if field.name not in 'email first_name last_name' %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+        </div>
+        {% endif %}
+        {% endfor %}
+        <button type="submit">Atualizar</button>
+    </form>
+    {% elif user.professor %}
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}      
+        {% if field.name not in 'first_name last_name' %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+        </div>
+        {% endif %}
+        {% endfor %}
+        <button type="submit">Atualizar</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock content %}

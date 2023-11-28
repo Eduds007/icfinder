@@ -112,9 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'icfinder_app.backends.CustomAuthenticationBackend',
-]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -122,8 +119,6 @@ AUTHENTICATION_BACKENDS = [
 LANGUAGE_CODE = "pt-br"
 
 TIME_ZONE = "America/Sao_Paulo"
-
-AUTH_USER_MODEL = 'icfinder_app.Users'
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'

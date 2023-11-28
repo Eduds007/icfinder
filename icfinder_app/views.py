@@ -2,11 +2,12 @@ from typing import Any
 from django.views import generic, View
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
+from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import AlunoPerfilForm, ProfessorPerfilForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm, ProjetoForm
 from django.views.generic.edit import CreateView, FormView, UpdateView
-from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message, Interesse
+from .models import Professor, Aluno, Projeto, InscricaoProjeto, Conversation, Message, Interesse
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -28,33 +29,22 @@ class CustomLoginView(LoginView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('index')
-        error_message = self.request.GET.get('error_message', '')
-        return super().get(request, *args, **kwargs, error_message=error_message)
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        email = form.cleaned_data['email']
-        password = form.cleaned_data['password']
+        user = form.get_user()
 
-        user = self.authenticate_user(email, password)
+        professor = Professor.objects.filter(
+            user__email=user.email,
+            login_completed=False
+        ).first()
 
-        if user is not None:
-            login(self.request, user)
-            professor = Professor.objects.filter(
-                user__email=email,
-                login_completed=False
-            ).first()
+        if professor:
+            self.request.session['validated_email'] = user.email
+            return redirect('registration_professor', professor_id=professor.id)
 
-            if professor:
-                self.request.session['validated_email'] = email
-                return redirect('registration_professor', professor_id=professor.id)
-
-        error_message = "Authentication failed or professor check failed."
-        return super().form_valid(form, error_message=error_message)
-
-    def authenticate_user(self, email, password):
-        from .backends import CustomAuthenticationBackend
-        backend = CustomAuthenticationBackend()
-        return backend.authenticate(request=self.request, username=email, password=password)
+        login(self.request, user)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('index')
@@ -87,17 +77,18 @@ class AlunoRegistrationView(View):
             if password1 != password2:
                 form.add_error('password2', 'Senhas não correspondentes.')
             else:
-                user_instance = Users.objects.create(
+                user_instance = User.objects.create(
+                    username=form.cleaned_data['email'],
                     first_name=form.cleaned_data['first_name'],
                     last_name=form.cleaned_data['last_name'],
                     email=form.cleaned_data['email'],
-                    phone_number=form.cleaned_data['phone_number'],
-                    short_bio=form.cleaned_data['short_bio'],
                 )
 
                 aluno_instance = Aluno.objects.create(
                     user=user_instance,
                     curso=form.cleaned_data['curso'],
+                    phone_number=form.cleaned_data['phone_number'],
+                    short_bio=form.cleaned_data['short_bio'],
                 )
 
                 #aluno_instance.interests.set(form.cleaned_data['interests'])
@@ -150,7 +141,7 @@ class ProfessorRegistrationView(FormView):
             return self.form_invalid(form)
 
         email_from_session = self.request.session.get('validated_email')
-        user_instance = Users.objects.get(email=email_from_session)
+        user_instance = User.objects.get(email=email_from_session)
 
         # Atualiza com os dados faltantes de usuário
         user_instance.first_name = form.cleaned_data['first_name']
@@ -312,7 +303,7 @@ class ResetPasswordView(FormView):
             temp_password = self.generate_token()
 
             try:
-                user_instance = Users.objects.get(email=email)
+                user_instance = User.objects.get(email=email)
                 user_instance.set_password(temp_password)
                 user_instance.save()
 
@@ -330,7 +321,7 @@ class ResetPasswordView(FormView):
                 email_msg.send(fail_silently=False)
 
                 return redirect(reverse('login'))
-            except Users.DoesNotExist:
+            except User.DoesNotExist:
                 pass
 
         return render(request, self.template_name, {'error': 'Invalid email'})
@@ -380,7 +371,7 @@ class ProjectDetailView(generic.DetailView):
          
         elif action.startswith('aceitar_'):
             user_email = action.split('_')[1]
-            user = Users.objects.filter(email = user_email).first()
+            user = User.objects.filter(email = user_email).first()
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'aceito'
@@ -391,7 +382,7 @@ class ProjectDetailView(generic.DetailView):
 
         elif action.startswith('recusar_'):
             user_email = action.split('_')[1]
-            user = Users.objects.filter(email = user_email).first()
+            user = User.objects.filter(email = user_email).first()
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'recusado'
@@ -457,7 +448,7 @@ class ProjectDeleteView(generic.DeleteView):
 
 @login_required
 def chat(request, receiver_id):
-    receiver = get_object_or_404(Users, id=receiver_id)
+    receiver = get_object_or_404(User, id=receiver_id)
     participants = [f'{request.user.id}'+f'{receiver.id}',f'{receiver.id}'+f'{request.user.id}']
     
     # Verifica se a conversa já existe entre os participantes

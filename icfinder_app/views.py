@@ -203,10 +203,20 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
         return Aluno.objects.get(user=self.request.user)
     
     def form_valid(self, form):
+        password1 = form.cleaned_data['password1']
+        password2 = form.cleaned_data['password2']
+
+        if password1 != password2:
+            form.add_error('password2', 'Senhas não correspondentes.')
+            return self.form_invalid(form)
+        
         aluno_instance = form.save(commit=False)
         aluno_instance.phone_number = form.cleaned_data['phone_number']
         aluno_instance.short_bio = form.cleaned_data['short_bio']
         aluno_instance.profile_pic = form.cleaned_data['profile_pic']
+        user_instance = self.request.user
+        user_instance.set_password(form.cleaned_data['password1'])
+        user_instance.save()
         aluno_instance.save()
 
         return redirect('perfil_detail', pk=self.request.user.id)
@@ -237,10 +247,20 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
         return Professor.objects.get(user=self.request.user)
 
     def form_valid(self, form):
+        password1 = form.cleaned_data['password1']
+        password2 = form.cleaned_data['password2']
+
+        if password1 != password2:
+            form.add_error('password2', 'Senhas não correspondentes.')
+            return self.form_invalid(form)
+        
         professor_instance = form.save(commit=False)
         professor_instance.phone_number = form.cleaned_data['phone_number']
         professor_instance.short_bio = form.cleaned_data['short_bio']
         professor_instance.profile_pic = form.cleaned_data['profile_pic']
+        user_instance = self.request.user
+        user_instance.set_password(form.cleaned_data['password1'])
+        user_instance.save()
         professor_instance.save()
 
         return redirect('perfil_detail', pk=self.request.user.id)
@@ -289,6 +309,7 @@ class Index(LoginRequiredMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context['is_aluno'] = is_aluno
         context['is_professor'] = is_professor
+        context['professor'] = professor_instance if is_professor else None
         context['num_projetos'] = self.get_queryset().filter(self.filterset_class(self.request.GET).qs.query.where).count()
         return context
     

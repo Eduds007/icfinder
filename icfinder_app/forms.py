@@ -126,12 +126,11 @@ class ProfessorTokenForm(forms.ModelForm):
 
     def save(self, commit=True):
         email = self.cleaned_data['email']
-
-        user_instance = User.objects.create(email=email)
+        password = self.generate_token()
+        user_instance = User.objects.create_user(email=email, password=password, username=email)
         instance = Professor(user=user_instance)
-        instance.token = self.generate_token()
+        instance.token = password
         instance.login_completed = False
-        user_instance.set_password(instance.token)
 
         if commit:
             user_instance.save()

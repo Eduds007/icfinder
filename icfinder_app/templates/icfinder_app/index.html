@@ -76,6 +76,7 @@ Página Inicial
     {% endfor %}
     {% elif is_professor %}
     {% for projeto in projetos %}
+    {% if projeto.responsavel == professor %}
     <a href="{% url 'detail' projeto.id %}">
       <div class="flip-card">
         <div class="flip-card-inner">
@@ -125,6 +126,7 @@ Página Inicial
         </div>
       </div>
     </a>
+    {% endif %}
     {% endfor %}
     <a href="{% url 'project_create' %}">
       <div class="card-add">

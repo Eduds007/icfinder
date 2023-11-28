@@ -18,13 +18,16 @@ Login
       <div class="separator"></div>
       <div class="login-section">
         <div class="login-title">Login</div>
+        {% if error_message %}
+            <p class="error">{{ error_message }}</p>
+        {% endif %} 
         <form method="post" action="{% url 'login' %}">
           {% csrf_token %}
           <div class="input-section">
             <div class="input-label">Email</div>
             <div class="input-field">
               <div class="icon">account_circle</div>
-              <span class="custom-input">{{ form.username }}</span>
+              <span class="custom-input">{{ form.email }}</span>
             </div>
           </div>
           <div class="input-section">

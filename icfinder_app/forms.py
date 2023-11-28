@@ -6,11 +6,11 @@ from django.core.exceptions import ValidationError
 
 class CustomAuthenticationForm(AuthenticationForm):
     widgets = {
-        'username': forms.EmailInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Email usp'}),
+        'email': forms.EmailInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Email usp'}),
         'password': forms.PasswordInput(attrs={'style': 'font-size: 20px; background: transparent; border: none; outline: none; color: black;', 'placeholder': 'Senha' }),
     }
 
-    username = forms.EmailField(widget=widgets['username'])
+    email = forms.EmailField(widget=widgets['email'])
     password = forms.CharField(widget=widgets['password'])
 
 class AlunoPerfilForm(forms.ModelForm):

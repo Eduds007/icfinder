@@ -28,22 +28,33 @@ class CustomLoginView(LoginView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('index')
-        return super().get(request, *args, **kwargs)
+        error_message = self.request.GET.get('error_message', '')
+        return super().get(request, *args, **kwargs, error_message=error_message)
 
     def form_valid(self, form):
-        response = super().form_valid(form)
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
 
-        user = self.request.user
-        professor = Professor.objects.filter(
-            user__email=user.email,
-            login_completed=False
-        ).first()
+        user = self.authenticate_user(email, password)
 
-        if professor:
-            self.request.session['validated_email'] = user.email
-            return redirect('registration_professor', professor_id=professor.id)
+        if user is not None:
+            login(self.request, user)
+            professor = Professor.objects.filter(
+                user__email=email,
+                login_completed=False
+            ).first()
 
-        return response
+            if professor:
+                self.request.session['validated_email'] = email
+                return redirect('registration_professor', professor_id=professor.id)
+
+        error_message = "Authentication failed or professor check failed."
+        return super().form_valid(form, error_message=error_message)
+
+    def authenticate_user(self, email, password):
+        from .backends import CustomAuthenticationBackend
+        backend = CustomAuthenticationBackend()
+        return backend.authenticate(request=self.request, username=email, password=password)
 
     def get_success_url(self):
         return reverse_lazy('index')

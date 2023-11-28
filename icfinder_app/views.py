@@ -167,13 +167,28 @@ class ProfessorRegistrationView(FormView):
     
 class PerfilDetailView(LoginRequiredMixin, View):
     template_name = 'icfinder_app/perfil_detail.html'
+    
     def get(self, request, *args, **kwargs):
-        user = request.user
-        context = {}
-        if isinstance(user, Aluno):
-            context = {'aluno': user}
-        elif isinstance(user, Professor):
-            context = {'professor': user}
+        try:
+            aluno_instance = Aluno.objects.get(user=request.user)
+            is_aluno = True
+        except Aluno.DoesNotExist:
+            is_aluno = False
+
+        try:
+            professor_instance = Professor.objects.get(user=request.user)
+            is_professor = True
+        except Professor.DoesNotExist:
+            is_professor = False
+
+        context = {
+            'user': request.user,
+            'is_aluno': is_aluno,
+            'is_professor': is_professor,
+            'aluno': aluno_instance if is_aluno else None,
+            'professor': professor_instance if is_professor else None,
+        }
+
         return render(request, self.template_name, context)
     
 
@@ -183,7 +198,7 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
     form_class = AlunoPerfilForm
 
     def get_object(self, queryset=None):
-        return self.request.user.aluno
+        return Aluno.objects.get(user=self.request.user)
     
     def form_valid(self, form):
         user_instance = self.request.user
@@ -200,12 +215,20 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(AlunoUpdateView, self).get_form_kwargs()
+        aluno_instance = self.get_object()
+        kwargs['instance'] = aluno_instance
         kwargs['initial'] = {
-            'phone_number': self.request.user.phone_number,
-            'short_bio': self.request.user.short_bio,
-            'profile_pic': self.request.user.profile_pic
+            'phone_number': aluno_instance.phone_number,
+            'short_bio': aluno_instance.short_bio,
+            'profile_pic': aluno_instance.profile_pic
         }
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_aluno'] = True
+        context['is_professor'] = False
+        return context
 
 class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     model = Professor
@@ -213,7 +236,7 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ProfessorPerfilForm
 
     def get_object(self, queryset=None):
-        return self.request.user.professor
+        return Professor.objects.get(user=self.request.user)
 
     def form_valid(self, form):
         user_instance = self.request.user
@@ -230,12 +253,20 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(ProfessorUpdateView, self).get_form_kwargs()
+        professor_instance = self.get_object()
+        kwargs['instance'] = professor_instance
         kwargs['initial'] = {
-            'phone_number': self.request.user.phone_number,
-            'short_bio': self.request.user.short_bio,
-            'profile_pic': self.request.user.profile_pic
+            'phone_number': professor_instance.phone_number,
+            'short_bio': professor_instance.short_bio,
+            'profile_pic': professor_instance.profile_pic
         }
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_aluno'] = False
+        context['is_professor'] = True
+        return context
 
 class Index(LoginRequiredMixin, FilterView):
     model = Projeto
@@ -249,7 +280,21 @@ class Index(LoginRequiredMixin, FilterView):
         return queryset
 
     def get_context_data(self, **kwargs):
+        try:
+            aluno_instance = Aluno.objects.get(user=self.request.user)
+            is_aluno = True
+        except Aluno.DoesNotExist:
+            is_aluno = False
+
+        try:
+            professor_instance = Professor.objects.get(user=self.request.user)
+            is_professor = True
+        except Professor.DoesNotExist:
+            is_professor = False
+
         context = super().get_context_data(**kwargs)
+        context['is_aluno'] = is_aluno
+        context['is_professor'] = is_professor
         context['num_projetos'] = self.get_queryset().filter(self.filterset_class(self.request.GET).qs.query.where).count()
         return context
     
@@ -332,15 +377,27 @@ class ProjectDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)# Adicionando variável ao contexto
         try:
-            aluno =  Aluno.objects.get(user =self.request.user)
+            aluno =  Aluno.objects.get(user=self.request.user)
             context['inscricao_estado'] = self.get_inscricao_estado()
         except Aluno.DoesNotExist:
             context['inscricao_estado'] = ''
     
+        try:
+            aluno_instance = Aluno.objects.get(user=self.request.user)
+            is_aluno = True
+        except Aluno.DoesNotExist:
+            is_aluno = False
+
+        try:
+            professor_instance = Professor.objects.get(user=self.request.user)
+            is_professor = True
+        except Professor.DoesNotExist:
+            is_professor = False
         
-            
+        context['is_aluno'] = is_aluno
+        context['is_professor'] = is_professor
+        context['professr'] = professor_instance if is_professor else None
         context['inscritos'] = self.get_inscritos()
-        print(context)
         return context
     
     def get_inscritos(self):
@@ -426,7 +483,7 @@ class ProjectCreateView(generic.CreateView):
 
     def form_valid(self, form):
         Projeto.objects.create(
-                    responsavel=self.request.user.professor,
+                    responsavel=Professor.objects.get(user=self.request.user),
                     lab=form.cleaned_data['lab'],
                     titulo=form.cleaned_data['titulo'],
                     descricao=form.cleaned_data['descricao'],

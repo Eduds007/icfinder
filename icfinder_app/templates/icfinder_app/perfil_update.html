@@ -11,7 +11,7 @@ Página de Edição do perfil
 {% block content %}
 <div class="perfil_form">
     <h2>Atualizar Dados do Perfil</h2>
-    {% if user.aluno %}
+    {% if is_aluno %}
     <form method="post">
         {% csrf_token %}
         {% for field in form.visible_fields %}
@@ -24,7 +24,7 @@ Página de Edição do perfil
         {% endfor %}
         <button type="submit">Atualizar</button>
     </form>
-    {% elif user.professor %}
+    {% elif is_professor %}
     <form method="post">
         {% csrf_token %}
         {% for field in form.visible_fields %}      

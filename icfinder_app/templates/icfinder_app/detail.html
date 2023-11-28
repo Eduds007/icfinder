@@ -39,7 +39,7 @@ Página do post
             </div>
             <div class="desc-line">
               <span class="icon">call</span> 
-              <p>{{projeto.responsavel.user.phone_number}}</p>
+              <p>{{projeto.responsavel.phone_number}}</p>
             </div>
             <div class="desc-line">
 
@@ -50,22 +50,21 @@ Página do post
             
             <div class="desc-line">
               <span class="icon">chat</span> 
-              {% if user.professor %}
-              {% if projeto.responsavel.disponibilidade %}
-              <p class = "Disponível">Disponível para chat</p>
-              {% else %}
-              <p class = "Indisponível">Indisponível</p>
+              {% if is_professor %}
+                {% if projeto.responsavel.disponibilidade %}
+                <p class = "Disponível">Disponível para chat</p>
+                {% else %}
+                <p class = "Indisponível">Indisponível</p>
+                {% endif %}
               {% endif %}
               
-              {% endif %}
-              
-              {% if user.aluno %}
+              {% if is_aluno %}
                 {% if projeto.responsavel.disponibilidade %}
                 <a class = "Disponível" href = "{% url 'chat' projeto.responsavel.user.id %}" > Disponível para chat</a>
                 {% else %}
                 <p class = "Indisponível">Indisponível</p>
                 {% endif %}
-                {% endif %}
+              {% endif %}
               </div>
           
             </div>
@@ -74,7 +73,7 @@ Página do post
         </div>
       </div>
     </div>
-    {% if user.professor %}
+    {% if is_professor %}
     <div class = 'secao_alunos'>
     {% if inscritos %}
     <p>Alunos interessados</p>
@@ -101,7 +100,7 @@ Página do post
 
     </div>
     
-    {% elif user.aluno %}
+    {% elif is_aluno %}
     <div class = 'secao_alunos'>
       {% if inscricao_estado == 'pendente' or  inscricao_estado == 'aceito' %}
       <p> Minha situação: {{ inscricao_estado }} </p>

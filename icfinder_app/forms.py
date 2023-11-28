@@ -1,6 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
-from .models import Users, Professor, Aluno, Interesse, Curso, Lab, Departamento
+from django.contrib.auth.forms import AuthenticationForm
+from .models import Users, Professor, Aluno, Interesse, Curso, Projeto
 import secrets
 from django.core.exceptions import ValidationError
 
@@ -139,5 +139,37 @@ class ProfessorTokenForm(forms.ModelForm):
 
         return instance
 
+class ProjetoForm(forms.ModelForm):
+    titulo = forms.CharField(
+        label='Título',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do projeto'})
+    )
+    descricao = forms.CharField(
+        label='Descrição',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Breve descrição'})
+    )
+    about = forms.CharField(
+        label='Sobre',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Projeto em mais detalhes'})
+    )
+    vagas = forms.CharField(
+        label='Vagas disponíveis',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de vagas'})
+    )
+    bgImg = forms.URLField(
+        label='Imagem de fundo',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira a URL da imagem'}),
+        required=False
+    )
+    cardImg = forms.URLField(
+        label='Imagem do card',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Insira a URL da imagem'}),
+        required=False
+    )
+
+    class Meta:
+        model = Projeto
+        fields = ['titulo', 'descricao', 'about', 'vagas', 'lab', 'bgImg', 'cardImg']
+
 class MessageForm(forms.Form):
-    content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Type your message...'}))
+    content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Digite sua mensagem...'}))

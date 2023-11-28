@@ -11,11 +11,18 @@ Página de criação de post
 
 
 {% block content %}
-<h2>Criar novo projeto</h2>
-<form method="post" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-</form>
+<div class="project_form">
+    <h2>Criar novo projeto</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+        </div>
+        {% endfor %}
+        <button type="submit">Salvar</button>
+    </form>
+</div>
     
 {% endblock %}

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -94,7 +95,7 @@ class Projeto(models.Model):
     vagas = models.IntegerField(default=1)
     bgImg = models.URLField()
     cardImg = models.URLField()
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
 
 
     def __str__(self):

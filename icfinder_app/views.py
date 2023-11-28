@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import AlunoPerfilForm, ProfessorPerfilForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
+from .forms import AlunoPerfilForm, ProfessorPerfilForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm, ProjetoForm
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message, Interesse
 from django.core.mail import EmailMessage
@@ -393,7 +393,7 @@ class ProjectDetailView(generic.DetailView):
 class ProjectUpdateView(generic.UpdateView):
     model = Projeto
     template_name = 'icfinder_app/update.html'
-    fields = '__all__'
+    form_class = ProjetoForm
 
     def get_success_url(self):
         return reverse('detail', kwargs={'pk': self.object.pk})
@@ -403,7 +403,21 @@ class ProjectCreateView(generic.CreateView):
     model = Projeto
     template_name = 'icfinder_app/new.html'
     success_url = reverse_lazy('index')
-    fields = '__all__'
+    form_class = ProjetoForm
+
+    def form_valid(self, form):
+        Projeto.objects.create(
+                    responsavel=self.request.user.professor,
+                    lab=form.cleaned_data['lab'],
+                    titulo=form.cleaned_data['titulo'],
+                    descricao=form.cleaned_data['descricao'],
+                    about=form.cleaned_data['about'],
+                    vagas=form.cleaned_data['vagas'],
+                    bgImg=form.cleaned_data['bgImg'],
+                    cardImg=form.cleaned_data['cardImg'],
+                )
+
+        return redirect('index')
 
 class ProjectDeleteView(generic.DeleteView):
     model = Projeto

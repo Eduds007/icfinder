@@ -1,6 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Users, Professor, Aluno, Interesse, Curso
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
+from .models import Users, Professor, Aluno, Interesse, Curso, Lab, Departamento
 import secrets
 from django.core.exceptions import ValidationError
 
@@ -125,3 +125,44 @@ class ProfessorTokenForm(forms.ModelForm):
 
 class MessageForm(forms.Form):
     content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Type your message...'}))
+
+
+
+class PerfilEditForm(forms.ModelForm):
+    # Campos específicos do Aluno
+    interests = forms.ModelMultipleChoiceField(
+        label='Interesses',
+        queryset=Interesse.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        required = False
+    )
+    curso = forms.ModelChoiceField(
+        label='Curso',
+        queryset=Curso.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required = False
+    )
+
+    # Campos específicos do Professor
+    departamento = forms.ModelChoiceField(
+        label='Departamento',
+        queryset=Departamento.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required = False
+    )
+    disponibilidade = forms.BooleanField(
+        label='Disponibilidade',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        required = False
+    )
+    lab = forms.ModelMultipleChoiceField(
+        label='Laboratórios',
+        queryset=Lab.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        required = False
+    )
+
+    class Meta:
+        model = Users
+        fields = ['phone_number', 'short_bio', 'interests', 'curso', 'departamento', 'disponibilidade','lab']
+

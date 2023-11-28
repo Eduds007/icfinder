@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Página de Edição do perfil
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_perfil.css' %}">
+{% endblock pagestyle %}
+{% block content %}
+<h2>Atualizar Dados do Perfil</h2>
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+
+  {% if user_type == 'Professor' %}
+    {{ form.interests }}
+    {{ form.curso }}
+  {% endif %}
+
+  {% if user_type == 'Professor' %}
+    {{ form.email }}
+    {{ form.departamento }}
+    {{ form.disponibilidade }}
+    {{ form.lab }}
+  {% endif %}
+  <button type="submit">Atualizar</button>
+</form>
+{% endblock content %}

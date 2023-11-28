@@ -32,7 +32,7 @@
                     {% else %}
                     <li><a href="{% url 'logout' %}"> <span class="icon">logout</span> Sair </a></li>
                     <li><a href="{% url 'chats' %}"> <span class="icon">chat_bubble</span> Conversas </a></li>
-                    <li> <span class="icon">account_circle</span> {{ user.first_name }} </li>
+                    <li><a href="{% url 'perfil_detail' pk=user.pk %}"> <span class="icon">account_circle</span> {{ user.first_name }}</a></li>
                     {% endif %}
                 </ul>
         </nav>

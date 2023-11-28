@@ -4,8 +4,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import AlunoCreationForm, ProfessorCreationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
-from django.views.generic.edit import CreateView, FormView
+from .forms import AlunoCreationForm, ProfessorCreationForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm, PerfilEditForm
+from django.views.generic.edit import CreateView, FormView, UpdateView
 from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message, Interesse
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
@@ -167,7 +167,93 @@ class ProfessorRegistrationView(FormView):
         login(self.request, user_instance)
 
         return redirect('index')
+    
+class PerfilDetailView(LoginRequiredMixin, View):
+    template_name = 'icfinder_app/perfil_detail.html'
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        context = {}
+        if isinstance(user, Aluno):
+            context = {'aluno': user}
+        elif isinstance(user, Professor):
+            context = {'professor': user}
+        return render(request, self.template_name, context)
+    
 
+class AlunoUpdateView(LoginRequiredMixin, UpdateView):
+    model = Aluno
+    template_name = 'icfinder_app/perfil_aluno_update.html'
+    # fields = ['interests', 'curso']
+    form_class = PerfilEditForm
+
+    def get_object(self, queryset=None):
+        return self.request.user.aluno
+    
+    def get_success_url(self):
+        return reverse_lazy('perfil_detail', kwargs={'pk': self.request.user.id})
+
+class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
+     model = Professor
+     template_name = 'icfinder_app/perfil_professor_update.html' 
+     # fields = ['departamento', 'disponibilidade', 'lab'] 
+     form_class = PerfilEditForm
+
+     def get_object(self, queryset=None):
+         return self.request.user.professor
+     def get_context_data(self, **kwargs):
+         context = super().get_context_data(**kwargs)
+         context['user_type'] = 'Professor'
+         return context
+    
+     def get_success_url(self):
+         return reverse_lazy('perfil_detail', kwargs={'pk': self.request.user.id})
+     
+     def form_valid(self, form, request):
+
+        email_from_session = self.request.session.get('validated_email')
+        user_instance = request.user
+
+        # Atualiza com os dados faltantes de usuário
+        user_instance.first_name = form.cleaned_data['first_name']
+        user_instance.last_name = form.cleaned_data['last_name']
+        user_instance.phone_number = form.cleaned_data['phone_number']
+        user_instance.short_bio = form.cleaned_data['short_bio']
+        user_instance.save()
+
+        # Atualiza os atributos agora com um professor com registro completo
+        professor_instance = Professor.objects.get(user=user_instance)
+        professor_instance.departamento = form.cleaned_data['departamento']
+        professor_instance.disponibilidade = form.cleaned_data['disponibilidade']
+        professor_instance.lab.set(form.cleaned_data['lab'])
+        professor_instance.token = None
+        professor_instance.login_completed = True
+        professor_instance.save()
+    
+        return redirect('perfil_detail')
+
+#tentando com views funcionais
+
+#O CÓDIGO ABAIXO ESTÁ INACABADO
+
+# def ProfessorUpdateView(request, professor_id):
+
+#     if request.method == "POST":
+#         form = PerfilEditForm(request.POST)
+#         if form.is_valid():
+#             Professor = PerfilEditForm.objects.get(id=professor_id)
+#             Professor.departamento = request.POST['departamento']
+#             Professor.disponibilidade = request.POST['disponibilidade']
+#             Professor.lab = request.POST['lab']
+
+#             Professor.save()
+#             return HttpResponseRedirect(
+#                 reverse('posts:detail', args=(Professor.id, )))
+
+#     else:
+#         form = PostForm()
+#         context = {'form': form}
+#         return render(request, 'posts/update.html', context)
+    
 class Index(LoginRequiredMixin, FilterView):
     model = Projeto
     template_name = 'icfinder_app/index.html'

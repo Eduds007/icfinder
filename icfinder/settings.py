@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'icfinder_app',
     'rest_framework',
     'api.apps.ApiConfig',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+   r"^https://.+\.e\.usp\.br$",
+   r"^https://.+\.vercel\.app$",
 ]
 
 ROOT_URLCONF = "icfinder.urls"

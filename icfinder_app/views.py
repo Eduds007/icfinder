@@ -2,11 +2,12 @@ from typing import Any
 from django.views import generic, View
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
+from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import AlunoPerfilForm, ProfessorPerfilForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm
+from .forms import AlunoPerfilForm, ProfessorPerfilForm, CustomAuthenticationForm, ProfessorTokenForm, MessageForm, ProjetoForm
 from django.views.generic.edit import CreateView, FormView, UpdateView
-from .models import Professor, Aluno, Users, Projeto, InscricaoProjeto, Conversation, Message, Interesse
+from .models import Professor, Aluno, Projeto, InscricaoProjeto, Conversation, Message, Interesse
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -76,17 +77,18 @@ class AlunoRegistrationView(View):
             if password1 != password2:
                 form.add_error('password2', 'Senhas não correspondentes.')
             else:
-                user_instance = Users.objects.create(
+                user_instance = User.objects.create(
+                    username=form.cleaned_data['email'],
                     first_name=form.cleaned_data['first_name'],
                     last_name=form.cleaned_data['last_name'],
                     email=form.cleaned_data['email'],
-                    phone_number=form.cleaned_data['phone_number'],
-                    short_bio=form.cleaned_data['short_bio'],
                 )
 
                 aluno_instance = Aluno.objects.create(
                     user=user_instance,
                     curso=form.cleaned_data['curso'],
+                    phone_number=form.cleaned_data['phone_number'],
+                    short_bio=form.cleaned_data['short_bio'],
                 )
 
                 #aluno_instance.interests.set(form.cleaned_data['interests'])
@@ -139,13 +141,11 @@ class ProfessorRegistrationView(FormView):
             return self.form_invalid(form)
 
         email_from_session = self.request.session.get('validated_email')
-        user_instance = Users.objects.get(email=email_from_session)
+        user_instance = User.objects.get(email=email_from_session)
 
         # Atualiza com os dados faltantes de usuário
         user_instance.first_name = form.cleaned_data['first_name']
         user_instance.last_name = form.cleaned_data['last_name']
-        user_instance.phone_number = form.cleaned_data['phone_number']
-        user_instance.short_bio = form.cleaned_data['short_bio']
         user_instance.save()
 
         # Atualiza os atributos agora com um professor com registro completo
@@ -155,6 +155,8 @@ class ProfessorRegistrationView(FormView):
         professor_instance.lab.set(form.cleaned_data['lab'])
         professor_instance.token = None
         professor_instance.login_completed = True
+        professor_instance.phone_number = form.cleaned_data['phone_number']
+        professor_instance.short_bio = form.cleaned_data['short_bio']
         professor_instance.save()
 
         # Atribui a senha ao usuário
@@ -167,13 +169,28 @@ class ProfessorRegistrationView(FormView):
     
 class PerfilDetailView(LoginRequiredMixin, View):
     template_name = 'icfinder_app/perfil_detail.html'
+    
     def get(self, request, *args, **kwargs):
-        user = request.user
-        context = {}
-        if isinstance(user, Aluno):
-            context = {'aluno': user}
-        elif isinstance(user, Professor):
-            context = {'professor': user}
+        try:
+            aluno_instance = Aluno.objects.get(user=request.user)
+            is_aluno = True
+        except Aluno.DoesNotExist:
+            is_aluno = False
+
+        try:
+            professor_instance = Professor.objects.get(user=request.user)
+            is_professor = True
+        except Professor.DoesNotExist:
+            is_professor = False
+
+        context = {
+            'user': request.user,
+            'is_aluno': is_aluno,
+            'is_professor': is_professor,
+            'aluno': aluno_instance if is_aluno else None,
+            'professor': professor_instance if is_professor else None,
+        }
+
         return render(request, self.template_name, context)
     
 
@@ -183,29 +200,43 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
     form_class = AlunoPerfilForm
 
     def get_object(self, queryset=None):
-        return self.request.user.aluno
+        return Aluno.objects.get(user=self.request.user)
     
     def form_valid(self, form):
-        user_instance = self.request.user
-        user_instance.phone_number = form.cleaned_data['phone_number']
-        user_instance.short_bio = form.cleaned_data['short_bio']
-        user_instance.profile_pic = form.cleaned_data['profile_pic']
-        user_instance.save()
+        password1 = form.cleaned_data['password1']
+        password2 = form.cleaned_data['password2']
 
+        if password1 != password2:
+            form.add_error('password2', 'Senhas não correspondentes.')
+            return self.form_invalid(form)
+        
         aluno_instance = form.save(commit=False)
-        aluno_instance.user = user_instance
+        aluno_instance.phone_number = form.cleaned_data['phone_number']
+        aluno_instance.short_bio = form.cleaned_data['short_bio']
+        aluno_instance.profile_pic = form.cleaned_data['profile_pic']
+        user_instance = self.request.user
+        user_instance.set_password(form.cleaned_data['password1'])
+        user_instance.save()
         aluno_instance.save()
 
         return redirect('perfil_detail', pk=self.request.user.id)
 
     def get_form_kwargs(self):
         kwargs = super(AlunoUpdateView, self).get_form_kwargs()
+        aluno_instance = self.get_object()
+        kwargs['instance'] = aluno_instance
         kwargs['initial'] = {
-            'phone_number': self.request.user.phone_number,
-            'short_bio': self.request.user.short_bio,
-            'profile_pic': self.request.user.profile_pic
+            'phone_number': aluno_instance.phone_number,
+            'short_bio': aluno_instance.short_bio,
+            'profile_pic': aluno_instance.profile_pic
         }
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_aluno'] = True
+        context['is_professor'] = False
+        return context
 
 class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     model = Professor
@@ -213,29 +244,43 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ProfessorPerfilForm
 
     def get_object(self, queryset=None):
-        return self.request.user.professor
+        return Professor.objects.get(user=self.request.user)
 
     def form_valid(self, form):
-        user_instance = self.request.user
-        user_instance.phone_number = form.cleaned_data['phone_number']
-        user_instance.short_bio = form.cleaned_data['short_bio']
-        user_instance.profile_pic = form.cleaned_data['profile_pic']
-        user_instance.save()
+        password1 = form.cleaned_data['password1']
+        password2 = form.cleaned_data['password2']
 
+        if password1 != password2:
+            form.add_error('password2', 'Senhas não correspondentes.')
+            return self.form_invalid(form)
+        
         professor_instance = form.save(commit=False)
-        professor_instance.user = user_instance
+        professor_instance.phone_number = form.cleaned_data['phone_number']
+        professor_instance.short_bio = form.cleaned_data['short_bio']
+        professor_instance.profile_pic = form.cleaned_data['profile_pic']
+        user_instance = self.request.user
+        user_instance.set_password(form.cleaned_data['password1'])
+        user_instance.save()
         professor_instance.save()
 
         return redirect('perfil_detail', pk=self.request.user.id)
 
     def get_form_kwargs(self):
         kwargs = super(ProfessorUpdateView, self).get_form_kwargs()
+        professor_instance = self.get_object()
+        kwargs['instance'] = professor_instance
         kwargs['initial'] = {
-            'phone_number': self.request.user.phone_number,
-            'short_bio': self.request.user.short_bio,
-            'profile_pic': self.request.user.profile_pic
+            'phone_number': professor_instance.phone_number,
+            'short_bio': professor_instance.short_bio,
+            'profile_pic': professor_instance.profile_pic
         }
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_aluno'] = False
+        context['is_professor'] = True
+        return context
 
 class Index(LoginRequiredMixin, FilterView):
     model = Projeto
@@ -248,8 +293,23 @@ class Index(LoginRequiredMixin, FilterView):
         queryset = queryset.prefetch_related(Prefetch("inscritos", queryset=InscricaoProjeto.objects.filter(estado='pendente')))
         return queryset
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
+        try:
+            aluno_instance = Aluno.objects.get(user=self.request.user)
+            is_aluno = True
+        except Aluno.DoesNotExist:
+            is_aluno = False
+
+        try:
+            professor_instance = Professor.objects.get(user=self.request.user)
+            is_professor = True
+        except Professor.DoesNotExist:
+            is_professor = False
+
         context = super().get_context_data(**kwargs)
+        context['is_aluno'] = is_aluno
+        context['is_professor'] = is_professor
+        context['professor'] = professor_instance if is_professor else None
         context['num_projetos'] = self.get_queryset().filter(self.filterset_class(self.request.GET).qs.query.where).count()
         return context
     
@@ -301,7 +361,7 @@ class ResetPasswordView(FormView):
             temp_password = self.generate_token()
 
             try:
-                user_instance = Users.objects.get(email=email)
+                user_instance = User.objects.get(email=email)
                 user_instance.set_password(temp_password)
                 user_instance.save()
 
@@ -319,7 +379,7 @@ class ResetPasswordView(FormView):
                 email_msg.send(fail_silently=False)
 
                 return redirect(reverse('login'))
-            except Users.DoesNotExist:
+            except User.DoesNotExist:
                 pass
 
         return render(request, self.template_name, {'error': 'Invalid email'})
@@ -332,15 +392,27 @@ class ProjectDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)# Adicionando variável ao contexto
         try:
-            aluno =  Aluno.objects.get(user =self.request.user)
+            aluno =  Aluno.objects.get(user=self.request.user)
             context['inscricao_estado'] = self.get_inscricao_estado()
         except Aluno.DoesNotExist:
             context['inscricao_estado'] = ''
     
+        try:
+            aluno_instance = Aluno.objects.get(user=self.request.user)
+            is_aluno = True
+        except Aluno.DoesNotExist:
+            is_aluno = False
+
+        try:
+            professor_instance = Professor.objects.get(user=self.request.user)
+            is_professor = True
+        except Professor.DoesNotExist:
+            is_professor = False
         
-            
+        context['is_aluno'] = is_aluno
+        context['is_professor'] = is_professor
+        context['professr'] = professor_instance if is_professor else None
         context['inscritos'] = self.get_inscritos()
-        print(context)
         return context
     
     def get_inscritos(self):
@@ -369,7 +441,7 @@ class ProjectDetailView(generic.DetailView):
          
         elif action.startswith('aceitar_'):
             user_email = action.split('_')[1]
-            user = Users.objects.filter(email = user_email).first()
+            user = User.objects.filter(email = user_email).first()
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'aceito'
@@ -380,7 +452,7 @@ class ProjectDetailView(generic.DetailView):
 
         elif action.startswith('recusar_'):
             user_email = action.split('_')[1]
-            user = Users.objects.filter(email = user_email).first()
+            user = User.objects.filter(email = user_email).first()
             aluno = get_object_or_404(Aluno, user=user)
             inscricao, created = InscricaoProjeto.objects.get_or_create(aluno=aluno, projeto=projeto)
             inscricao.estado = 'recusado'
@@ -393,17 +465,50 @@ class ProjectDetailView(generic.DetailView):
 class ProjectUpdateView(generic.UpdateView):
     model = Projeto
     template_name = 'icfinder_app/update.html'
-    fields = '__all__'
+    form_class = ProjetoForm
 
-    def get_success_url(self):
-        return reverse('detail', kwargs={'pk': self.object.pk})
+    def form_valid(self, form):
+        projeto_instance = self.object
+        projeto_instance.lab=form.cleaned_data['lab']
+        projeto_instance.titulo=form.cleaned_data['titulo']
+        projeto_instance.descricao=form.cleaned_data['descricao']
+        projeto_instance.about=form.cleaned_data['about']
+        projeto_instance.vagas=form.cleaned_data['vagas']
+        projeto_instance.bgImg=form.cleaned_data['bgImg']
+        projeto_instance.cardImg=form.cleaned_data['cardImg']
+        projeto_instance.save()
+
+        return redirect('detail', pk=self.object.pk)
+
+    def get_form_kwargs(self):
+        kwargs = super(ProjectUpdateView, self).get_form_kwargs()
+        kwargs['initial'] = {
+            'titulo': self.object.titulo,
+            'descricao': self.object.descricao,
+            'about': self.object.descricao
+        }
+        return kwargs
     
 
 class ProjectCreateView(generic.CreateView):
     model = Projeto
     template_name = 'icfinder_app/new.html'
     success_url = reverse_lazy('index')
-    fields = '__all__'
+    form_class = ProjetoForm
+
+    def form_valid(self, form):
+        Projeto.objects.create(
+                    responsavel=Professor.objects.get(user=self.request.user),
+                    lab=form.cleaned_data['lab'],
+                    titulo=form.cleaned_data['titulo'],
+                    descricao=form.cleaned_data['descricao'],
+                    about=form.cleaned_data['about'],
+                    vagas=form.cleaned_data['vagas'],
+                    bgImg=form.cleaned_data['bgImg'],
+                    cardImg=form.cleaned_data['cardImg'],
+                )
+
+        return redirect('index')
 
 class ProjectDeleteView(generic.DeleteView):
     model = Projeto
@@ -413,7 +518,7 @@ class ProjectDeleteView(generic.DeleteView):
 
 @login_required
 def chat(request, receiver_id):
-    receiver = get_object_or_404(Users, id=receiver_id)
+    receiver = get_object_or_404(User, id=receiver_id)
     participants = [f'{request.user.id}'+f'{receiver.id}',f'{receiver.id}'+f'{request.user.id}']
     
     # Verifica se a conversa já existe entre os participantes

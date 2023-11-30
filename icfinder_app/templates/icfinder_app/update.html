@@ -1,10 +1,27 @@
 {% extends 'base.html' %}
-{% block content %}
-<h2>Atualizar Dados do Projeto</h2>
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
+{% load static %}
 
-  <button type="submit">Atualizar</button>
-</form>
+{% block title %}
+Edição de projeto
+{% endblock title %}
+
+{% block pagestyle %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style_new.css' %}">
+{% endblock pagestyle %}
+
+
+{% block content %}
+<div class="project_form">
+  <h2>Atualizar Dados do Projeto</h2>
+  <form method="post">
+      {% csrf_token %}
+      {% for field in form.visible_fields %}
+      <div class="form-group">
+          {{ field.label_tag }}
+          {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit">Salvar</button>
+  </form>
+</div>
 {% endblock content %}

@@ -6,7 +6,6 @@ from .models import *
 admin.site.register(Interesse)
 admin.site.register(Curso)
 admin.site.register(Departamento)
-admin.site.register(Users)
 admin.site.register(Lab)
 admin.site.register(Professor)
 admin.site.register(Projeto)

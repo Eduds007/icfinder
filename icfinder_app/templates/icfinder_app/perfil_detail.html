@@ -15,39 +15,48 @@ Página de perfil
     <h1 id = "título">Seu perfil</h1>
     <div class="gerais"> 
       <div class="profile-pic-container">
-        <img class = 'bgImg' src= "{{ user.profile_pic }}" alt="bgImg">
+        {% if is_professor %}
+        <img class = 'bgImg' src= "{{ professor.profile_pic }}" alt="bgImg">
+        {% elif is_aluno %}
+        <img class = 'bgImg' src= "{{ aluno.profile_pic }}" alt="bgImg">
+        {% endif %}
       </div>
       <p>{{user.first_name}} {{user.last_name}}</p>
       <p>{{user.email}}</p>
-      <p>{{user.phone_number}}</p>
       
-      {% if user.professor %}
-        <p>{{user.professor.departamento}}</p>
-        {% if user.professor.disponibilidade %}
+      {% if is_professor %}
+        <p>{{professor.phone_number}}</p>
+        <p>{{professor.departamento}}</p>
+        {% if professor.disponibilidade %}
         <p id = "Disponível">Disponível para chat</p>
         {% else%}
         <p id = "Indisponível">Indisponível</p>
         {% endif %}
       {% endif %}
 
-      {% if user.aluno %}
-        <p>{{user.aluno.curso}}</p>
+      {% if is_aluno %}
+      <p>{{ aluno.phone_number }}</p>
+      <p>{{ aluno.curso }}</p>
       {% endif %}
 
     </div>
 
     <div class = "short_bio">
       <h2 id = "short_bio_titulo">Descrição</h2>
-      <p class = "box_text">{{user.short_bio}}</p>
+      {% if is_aluno %}
+      <p class = "box_text">{{aluno.short_bio}}</p>
+      {% elif is_professor %}
+      <p class = "box_text">{{professor.short_bio}}</p>
+      {% endif %}
     </div>
 
 
-    {% if user.professor %}
+    {% if is_professor %}
     <div class="professor">
 
       <h2>Laboratórios:</h2>
       <div class = "box_text">
-        {% for lab in user.professor.lab.all %}
+        {% for lab in professor.lab.all %}
         <p>{{lab}}</p>
         {% endfor %}
       </div>
@@ -55,10 +64,10 @@ Página de perfil
 
     <a class = "button_edit" href="{% url 'perfil_professor_update' user.id %}">Editar perfil</a>
 
-    {% elif user.aluno %}
+    {% elif is_aluno %}
     <h2>Interesses:</h2>
     <div class = "box_text">
-      {% for interest in user.aluno.interests.all %}
+      {% for interest in aluno.interests.all %}
       <p>{{interest}}</p>
       {% endfor %}
     </div>

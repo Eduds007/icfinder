@@ -35,33 +35,6 @@ form {
     flex-wrap: wrap;
 }
 
-.card {
-    width: 30%;
-    min-width: 400px;
-    height: auto;
-    text-align: center;
-    text-decoration: none;
-    color: black;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 15px;
-    box-sizing: border-box;
-    overflow: hidden;
-    margin: 30px 40px 0 0;
-    transition: background-color 0.3s;
-}
-
-.card img {
-    width: 100%;
-    height: auto;
-    max-height: 50%;
-    margin-bottom: 10px;
-}
-
-.card:hover {
-    background-color: #dcdcdc;
-}
 
 @media (max-width: 600px) {
 }
@@ -91,12 +64,13 @@ input[type="password"] {
 
 .balloon {
     display: inline-block;
-    padding: 10px;
-    margin: 5px;
+    padding: 15px;
+    margin: 1vw 0.5vw;
     border: 1px solid #ccc;
     cursor: pointer;
     border-radius: 10px;
     text-align: center;
+    font-size: large;
   }
   
   .hidden-checkbox {
@@ -124,3 +98,15 @@ input[type="password"] {
   .registration_form {
     margin: 40px auto;
   }
+
+  h2{
+
+    color: var(--preto, #000);
+    font-family: ABeeZee;
+    font-size: 48px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    margin-bottom: 1vw;
+    }

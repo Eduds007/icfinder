@@ -16,18 +16,20 @@ Cadastro
 {% endblock pagescript %}
 
 {% block content %}
-<h2>Select Your Interests</h2>
-  
-<form method="post" action="{% url 'interests_selection' %}" id="interestsForm">
-  {% csrf_token %}
-  
-  {% for interest in interests %}
-    <label class="balloon" for="interest_{{ interest.id }}">
-      <input type="checkbox" id="interest_{{ interest.id }}" name="interests" value="{{ interest.id }}" class="hidden-checkbox">
-      <span>{{ interest.interesse }}</span>
-    </label>
-  {% endfor %}
-  
-  <button type="submit">Submit</button>
-</form>
+<div class="registration_form">
+  <h2>Selecione seus interesses</h2>
+  <form method="post" action="{% url 'interests_selection' %}" id="interestsForm">
+    {% csrf_token %}
+    <div class="form-group">
+      {% for interest in interests %}
+        <label class="balloon" for="interest_{{ interest.id }}">
+          <input type="checkbox" id="interest_{{ interest.id }}" name="interests" value="{{ interest.id }}" class="hidden-checkbox">
+          <span>{{ interest.interesse }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    
+    <button type="submit">Concluir</button>
+  </form>
+</div>
 {% endblock %}

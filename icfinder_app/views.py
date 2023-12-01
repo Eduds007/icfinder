@@ -261,6 +261,7 @@ class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
         professor_instance.phone_number = form.cleaned_data['phone_number']
         professor_instance.short_bio = form.cleaned_data['short_bio']
         professor_instance.profile_pic = form.cleaned_data['profile_pic']
+        professor_instance.lab.set(form.cleaned_data['lab'])
         user_instance = self.request.user
         user_instance.set_password(form.cleaned_data['password1'])
         user_instance.save()

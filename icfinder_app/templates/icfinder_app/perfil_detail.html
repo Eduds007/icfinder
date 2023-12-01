@@ -42,31 +42,22 @@ Página de perfil
         <span class="icon">business_benter</span> 
         {% if is_professor %}
         <p>{{professor.departamento}}</p>
-        {% if professor.disponibilidade %}
-        <p id = "Disponível">Disponível para chat</p>
-        {% else%}
-        <p id = "Indisponível">Indisponível</p>
-        {% endif %}
+        {% else %}
+        <p>{{aluno.curso}}</p>
+
       {% endif %}
       </div>
 
       <div class="desc-line">
-        <span class="icon">chat</span> 
         {% if is_professor %}
-          {% if projeto.responsavel.disponibilidade %}
+        <span class="icon">chat</span> 
+          {% if professor.disponibilidade %}
           <p class = "Disponível">Disponível para chat</p>
           {% else %}
           <p class = "Indisponível">Indisponível</p>
           {% endif %}
         {% endif %}
         
-        {% if is_aluno %}
-          {% if projeto.responsavel.disponibilidade %}
-          <a class = "Disponível" href = "{% url 'chat' projeto.responsavel.user.id %}" > Disponível para chat</a>
-          {% else %}
-          <p class = "Indisponível">Indisponível</p>
-          {% endif %}
-        {% endif %}
         </div>
 
     </div>
@@ -92,7 +83,7 @@ Página de perfil
       </div>
     </div>
 
-    <a class = "button_edit" href="{% url 'perfil_professor_update' user.id %}">Editar perfil</a>
+    <a class = "btn-class" href="{% url 'perfil_professor_update' user.id %}">Editar perfil</a>
 
     {% elif is_aluno %}
     <h2>Interesses:</h2>
@@ -102,7 +93,7 @@ Página de perfil
       {% endfor %}
     </div>
 
-    <a class = "button_edit" href = "{% url 'perfil_aluno_update' user.id %}">Editar perfil</a>
+    <a class = "btn-class" href = "{% url 'perfil_aluno_update' user.id %}">Editar perfil</a>
     {% endif %}
   </div>
 {% endblock %}

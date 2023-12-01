@@ -93,9 +93,9 @@ Página do post
     </div>
 
     <div class = 'edit_delete'>
-    <p class = "ref"> Vagas: {{ projeto.vagas }}</p> 
-    <a class="ref" href="{% url 'project_update' projeto.id %}">Editar projeto</a>
-    <a class ="ref" href="{% url 'project_delete' projeto.id %}">Deletar projeto</a>
+    <p class = "btn-class"> Vagas: {{ projeto.vagas }}</p> 
+    <a class="btn-class" href="{% url 'project_update' projeto.id %}">Editar projeto</a>
+    <a class ="btn-class" href="{% url 'project_delete' projeto.id %}">Deletar projeto</a>
 
     </div>
     

@@ -24,7 +24,7 @@ Login
         <form method="post" action="{% url 'login' %}">
           {% csrf_token %}
           <div class="input-section">
-            <div class="input-label">Email</div>
+            <div class="input-label">Usuário</div>
             <div class="input-field">
               <div class="icon">account_circle</div>
               <span class="custom-input">{{ form.username }}</span>

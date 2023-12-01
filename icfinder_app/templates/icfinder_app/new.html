@@ -15,6 +15,18 @@ Criação de projeto
     <h2>Criar novo projeto</h2>
     <form method="post">
         {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Erro no formulário. Por favor, corrija os campos destacados:</strong>
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
         {% for field in form.visible_fields %}
         <div class="form-group">
             {{ field.label_tag }}

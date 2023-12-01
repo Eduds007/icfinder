@@ -14,7 +14,31 @@ Página de Edição do perfil
     {% if is_aluno %}
     <form method="post">
         {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Erro no formulário. Por favor, corrija os campos destacados:</strong>
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
         {% for field in form.visible_fields %}
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Erro no formulário. Por favor, corrija os campos destacados:</strong>
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
         {% if field.name not in 'email first_name last_name' %}
         <div class="form-group">
             {{ field.label_tag }}
@@ -27,6 +51,18 @@ Página de Edição do perfil
     {% elif is_professor %}
     <form method="post">
         {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Erro no formulário. Por favor, corrija os campos destacados:</strong>
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
         {% for field in form.visible_fields %}      
         {% if field.name not in 'first_name last_name' %}
         <div class="form-group">

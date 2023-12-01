@@ -20,6 +20,9 @@ from django_filters.views import FilterView
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 import secrets
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+
 
 class CustomLoginView(LoginView):
     template_name = 'icfinder_app/login.html'
@@ -497,6 +500,7 @@ class ProjectCreateView(generic.CreateView):
     form_class = ProjetoForm
 
     def form_valid(self, form):
+        print('aqui')
         Projeto.objects.create(
                     responsavel=Professor.objects.get(user=self.request.user),
                     lab=form.cleaned_data['lab'],
@@ -507,8 +511,11 @@ class ProjectCreateView(generic.CreateView):
                     bgImg=form.cleaned_data['bgImg'],
                     cardImg=form.cleaned_data['cardImg'],
                 )
-
+        messages.success(self.request, 'Registro criado com sucesso!')
         return redirect('index')
+
+
+
 
 class ProjectDeleteView(generic.DeleteView):
     model = Projeto

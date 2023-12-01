@@ -21,11 +21,26 @@ Página de perfil
         <img class = 'bgImg' src= "{{ aluno.profile_pic }}" alt="bgImg">
         {% endif %}
       </div>
-      <p>{{user.first_name}} {{user.last_name}}</p>
-      <p>{{user.email}}</p>
-      
-      {% if is_professor %}
+
+      <div class="desc-line">
+        <span class="icon">badge</span> 
+        <p>{{user.first_name}} {{user.last_name}}</p>
+      </div>
+      <div class="desc-line">
+        <span class="icon">mail</span> 
+        <p>{{user.email}}</p>
+      </div>
+      <div class="desc-line">
+        <span class="icon">call</span> 
+        {% if is_professor %}
         <p>{{professor.phone_number}}</p>
+        {% elif is_aluno %}
+        <p>{{ aluno.phone_number }}</p>
+        {% endif %}
+      </div>
+      <div class="desc-line">
+        <span class="icon">business_benter</span> 
+        {% if is_professor %}
         <p>{{professor.departamento}}</p>
         {% if professor.disponibilidade %}
         <p id = "Disponível">Disponível para chat</p>
@@ -33,11 +48,26 @@ Página de perfil
         <p id = "Indisponível">Indisponível</p>
         {% endif %}
       {% endif %}
+      </div>
 
-      {% if is_aluno %}
-      <p>{{ aluno.phone_number }}</p>
-      <p>{{ aluno.curso }}</p>
-      {% endif %}
+      <div class="desc-line">
+        <span class="icon">chat</span> 
+        {% if is_professor %}
+          {% if projeto.responsavel.disponibilidade %}
+          <p class = "Disponível">Disponível para chat</p>
+          {% else %}
+          <p class = "Indisponível">Indisponível</p>
+          {% endif %}
+        {% endif %}
+        
+        {% if is_aluno %}
+          {% if projeto.responsavel.disponibilidade %}
+          <a class = "Disponível" href = "{% url 'chat' projeto.responsavel.user.id %}" > Disponível para chat</a>
+          {% else %}
+          <p class = "Indisponível">Indisponível</p>
+          {% endif %}
+        {% endif %}
+        </div>
 
     </div>
 

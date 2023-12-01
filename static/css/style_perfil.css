@@ -112,3 +112,9 @@ input[type="password"] {
 .perfil_form {
     margin: 40px auto;
   }
+
+.desc-line {
+    display: flex;
+    gap: 1rem;
+    
+}
